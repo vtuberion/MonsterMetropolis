@@ -1,6 +1,7 @@
 package com.badlogic.monstermetrodraft;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -125,8 +126,20 @@ public class GameScreen implements Screen {
                 // Move lizard based on touch position
                 lizardX = touchPos.x - lizardRightTexture.getWidth() / 2;
                 lizardY = touchPos.y - lizardRightTexture.getHeight() / 2;
-                lizardBounds.setPosition(lizardX, lizardY);
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                lizardX = lizardX - 1;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                lizardX = lizardX + 1;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                lizardY = lizardY + 1;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                lizardY = lizardY - 1;
+            }
+            lizardBounds.setPosition(lizardX, lizardY);
 
             // Update bounds
             lizardBounds.setPosition(lizardX, lizardY);
