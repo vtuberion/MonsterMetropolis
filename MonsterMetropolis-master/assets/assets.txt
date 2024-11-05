@@ -1,8 +1,0 @@
-city_background.png
-coin.png
-game_over.jpg
-libgdx.png
-lizard_left.png
-lizard_right.png
-spike.png
-start_button.png
