@@ -16,16 +16,16 @@ public class GameScreen implements Screen {
     private final monstermetropolis game;
     private SpriteBatch batch;
     private BitmapFont font;
-    private BitmapFont gameOverFont; // New font for Game Over screen
+    private BitmapFont gameOverFont;
 
     // Textures
     private Texture cityBackground;
     private Texture coinTexture;
-    private Texture lizardRightTexture;
+    private Texture dinoRightTexture;
 
     // Sprites and Positions
-    private Rectangle lizardBounds;
-    private float lizardX, lizardY;
+    private Rectangle dinobounds;
+    private float dinoX, dinoY;
     private float lizardVelocityY = 0;
     private float gravity = -500f;
     private float jumpVelocity = 250f;
@@ -55,15 +55,15 @@ public class GameScreen implements Screen {
         // Load assets
         cityBackground = new Texture("city_background.png");
         coinTexture = new Texture("coin.png");
-        lizardRightTexture = new Texture("dino_right.png"); // Changed to use dino_right.png
+        dinoRightTexture = new Texture("dino_right.png");
 
         resetGame();
     }
 
     private void resetGame() {
-        lizardX = 50;
-        lizardY = 0; // Set to 0 to spawn on the ground
-        lizardBounds = new Rectangle(lizardX, lizardY, lizardRightTexture.getWidth(), lizardRightTexture.getHeight());
+        dinoX = 50;
+        dinoY = 0; // Set to 0 to spawn on the ground
+        dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth(), dinoRightTexture.getHeight());
         lizardVelocityY = 0;
         isGameOver = false;
         isGameStarted = false;
@@ -95,7 +95,7 @@ public class GameScreen implements Screen {
         float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
         boolean fromLeft = random.nextBoolean();
 
-        float jetX = fromLeft ? -lizardRightTexture.getWidth() : Gdx.graphics.getWidth();
+        float jetX = fromLeft ? -dinoRightTexture.getWidth() : Gdx.graphics.getWidth();
         float speed = fromLeft ? 300 : -300; // Faster speed for jets
         Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png"); // Use appropriate jet texture
 
@@ -131,7 +131,7 @@ public class GameScreen implements Screen {
 
             if (!isGameOver) {
                 // Draw the lizard
-                batch.draw(lizardRightTexture, lizardX, lizardY);
+                batch.draw(dinoRightTexture, dinoX, dinoY);
 
                 // Draw and update coins
                 updateCoins(delta);
@@ -172,18 +172,18 @@ public class GameScreen implements Screen {
     private void applyGravity(float delta) {
         // Update vertical velocity with gravity and apply to lizard's Y position
         lizardVelocityY += gravity * delta;
-        lizardY += lizardVelocityY * delta;
+        dinoY += lizardVelocityY * delta;
 
         // Keep lizard within screen bounds
-        if (lizardY < 0) {
-            lizardY = 0;
+        if (dinoY < 0) {
+            dinoY = 0;
             lizardVelocityY = 0;
-        } else if (lizardY + lizardRightTexture.getHeight() > Gdx.graphics.getHeight()) {
-            lizardY = Gdx.graphics.getHeight() - lizardRightTexture.getHeight();
+        } else if (dinoY + dinoRightTexture.getHeight() > Gdx.graphics.getHeight()) {
+            dinoY = Gdx.graphics.getHeight() - dinoRightTexture.getHeight();
             lizardVelocityY = 0;
         }
 
-        lizardBounds.setPosition(lizardX, lizardY);
+        dinobounds.setPosition(dinoX, dinoY);
     }
 
     private void handleInput() {
@@ -221,7 +221,7 @@ public class GameScreen implements Screen {
     private void checkCollisions() {
         for (int i = 0; i < coins.size(); i++) {
             Rectangle coin = coins.get(i);
-            if (lizardBounds.overlaps(coin)) {
+            if (dinobounds.overlaps(coin)) {
                 coins.remove(i);
                 score++;
                 spawnCoins();
@@ -230,7 +230,7 @@ public class GameScreen implements Screen {
         }
 
         for (Jet jet : jets) {
-            if (lizardBounds.overlaps(jet.bounds)) {
+            if (dinobounds.overlaps(jet.bounds)) {
                 gameOver();
                 break;
             }
@@ -255,7 +255,7 @@ public class GameScreen implements Screen {
         gameOverFont.dispose();
         cityBackground.dispose();
         coinTexture.dispose();
-        lizardRightTexture.dispose();
+        dinoRightTexture.dispose();
 
         // Dispose jet textures to prevent memory leaks
         for (Jet jet : jets) {
