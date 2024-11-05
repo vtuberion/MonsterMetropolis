@@ -1,8 +1,12 @@
+building1.png
+building2.png
+building3.png
 city_background.png
 coin.png
-game_over.jpg
-libgdx.png
-lizard_left.png
-lizard_right.png
+dino_left.piskel
+dino_left.png
+dino_right.piskel
+dino_right.png
+jet_left.png
+jet_right.png
 spike.png
-start_button.png

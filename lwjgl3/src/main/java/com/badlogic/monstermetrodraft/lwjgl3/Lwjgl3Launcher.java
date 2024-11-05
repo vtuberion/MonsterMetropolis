@@ -2,7 +2,7 @@ package com.badlogic.monstermetrodraft.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.monstermetrodraft.monstermetrodraft;
+import com.badlogic.monstermetrodraft.monstermetropolis;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -12,7 +12,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new monstermetrodraft(), getDefaultConfiguration());
+        return new Lwjgl3Application(new monstermetropolis(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

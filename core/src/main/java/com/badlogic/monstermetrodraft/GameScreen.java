@@ -1,13 +1,11 @@
 package com.badlogic.monstermetrodraft;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -15,67 +13,96 @@ import java.util.List;
 import java.util.Random;
 
 public class GameScreen implements Screen {
-    private final monstermetrodraft game;
+    private final monstermetropolis game;
     private SpriteBatch batch;
+    private BitmapFont font;
+    private BitmapFont gameOverFont; // New font for Game Over screen
 
     // Textures
     private Texture cityBackground;
     private Texture coinTexture;
-    private Texture lizardLeftTexture;
     private Texture lizardRightTexture;
-    private Texture spikeTexture;
-    private Texture gameOverTexture;
 
-    // Sprites
+    // Sprites and Positions
     private Rectangle lizardBounds;
-
-    // Positions and State
-    private float lizardX;
-    private float lizardY;
+    private float lizardX, lizardY;
+    private float lizardVelocityY = 0;
+    private float gravity = -500f;
+    private float jumpVelocity = 250f;
     private boolean isGameOver;
+    private boolean isGameStarted;
 
-    // List for coins
+    // Lists for coins and jets
     private List<Rectangle> coins;
+    private List<Jet> jets;
     private int score;
     private Random random;
 
-    // Scrolling background variables
-    private float bgScrollSpeed = 4.0f; // Increased speed of the background scrolling
-    private float bgOffset = 0; // Current offset for the scrolling background
+    // Scrolling background and coin variables
+    private float bgScrollSpeed = 4.0f;
+    private float coinScrollSpeed = 2.0f; // Slower than the background
+    private float bgOffset = 0;
 
-    public GameScreen(final monstermetrodraft game) {
+    public GameScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
+        this.font = new BitmapFont(); // Use default font for simplicity
+        this.gameOverFont = new BitmapFont(); // Initialize game over font
+
+        // Set font size for game over screen (you can adjust the size)
+        gameOverFont.getData().setScale(2.0f); // Increase font size
 
         // Load assets
         cityBackground = new Texture("city_background.png");
         coinTexture = new Texture("coin.png");
-        lizardLeftTexture = new Texture("lizard_left.png");
-        lizardRightTexture = new Texture("lizard_right.png");
-        spikeTexture = new Texture("spike.png");
-        gameOverTexture = new Texture("game_over.jpg");
+        lizardRightTexture = new Texture("dino_right.png"); // Changed to use dino_right.png
 
-        lizardX = 50; // Starting position
-        lizardY = 200; // Starting position
-        lizardBounds = new Rectangle(lizardX, lizardY, lizardRightTexture.getWidth(), lizardRightTexture.getHeight());
-        isGameOver = false;
-
-        // Initialize coins
-        coins = new ArrayList<>();
-        random = new Random();
-        spawnCoins();
-        score = 0;
+        resetGame();
     }
 
+    private void resetGame() {
+        lizardX = 50;
+        lizardY = 0; // Set to 0 to spawn on the ground
+        lizardBounds = new Rectangle(lizardX, lizardY, lizardRightTexture.getWidth(), lizardRightTexture.getHeight());
+        lizardVelocityY = 0;
+        isGameOver = false;
+        isGameStarted = false;
+        score = 0;
+
+        // Initialize coins and jets
+        coins = new ArrayList<>();
+        jets = new ArrayList<>();
+        random = new Random();
+        spawnCoins();
+        spawnJet();
+    }
+
+
     private void spawnCoins() {
-        // Spawn up to three coins at random positions
         while (coins.size() < 3) {
-            float coinX = random.nextFloat() * (Gdx.graphics.getWidth() - 32); // Random x position within screen width
-            float coinY = random.nextFloat() * (Gdx.graphics.getHeight() - 32); // Random y position within screen height
-            Rectangle coin = new Rectangle(coinX, coinY, 32, 32); // Create coin rectangle
+            float coinX = random.nextFloat() * (Gdx.graphics.getWidth() - 32);
+            float coinY = random.nextFloat() * (Gdx.graphics.getHeight() - 32);
+            Rectangle coin = new Rectangle(coinX, coinY, 32, 32);
             coins.add(coin);
         }
     }
+
+    private void spawnJet() {
+        // Define the height of the jet texture (adjust if needed)
+        float jetHeight = 64;
+
+        // Spawn jets only above half the screen height, while ensuring they don't overflow
+        float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
+        boolean fromLeft = random.nextBoolean();
+
+        float jetX = fromLeft ? -lizardRightTexture.getWidth() : Gdx.graphics.getWidth();
+        float speed = fromLeft ? 300 : -300; // Faster speed for jets
+        Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png"); // Use appropriate jet texture
+
+        jets.add(new Jet(jetX, jetY, speed, jetTexture)); // Pass jet texture to Jet constructor
+    }
+
+
 
     @Override
     public void show() {}
@@ -83,84 +110,131 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // Clear screen
-        ScreenUtils.clear(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Update the background offset for scrolling
-        bgOffset += bgScrollSpeed * delta;
-        if (bgOffset > cityBackground.getWidth()) {
-            bgOffset -= cityBackground.getWidth();
-        }
+        ScreenUtils.clear(0, 0, 0, 1); // Clear screen color
 
         batch.begin();
-        // Draw the background twice to create a seamless scrolling effect
-        batch.draw(cityBackground, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(cityBackground, -bgOffset + cityBackground.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        if (!isGameOver) {
-            // Draw the lizard
-            batch.draw(lizardRightTexture, lizardX, lizardY); // Using lizardRightTexture directly
-            // Draw coins
-            for (Rectangle coin : coins) {
-                batch.draw(coinTexture, coin.x, coin.y);
+        if (!isGameStarted) {
+            if (Gdx.input.isTouched()) {
+                isGameStarted = true;
+            }
+        } else {
+            // Update background scroll
+            bgOffset += bgScrollSpeed * delta;
+            if (bgOffset > cityBackground.getWidth()) {
+                bgOffset -= cityBackground.getWidth();
             }
 
-            // Check for collisions
-            checkCollisions();
+            // Draw the background twice for seamless scrolling
+            batch.draw(cityBackground, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(cityBackground, -bgOffset + cityBackground.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        } else {
-            // Draw game over screen
-            batch.draw(gameOverTexture, 0, 0);
+            if (!isGameOver) {
+                // Draw the lizard
+                batch.draw(lizardRightTexture, lizardX, lizardY);
+
+                // Draw and update coins
+                updateCoins(delta);
+                for (Rectangle coin : coins) {
+                    batch.draw(coinTexture, coin.x, coin.y);
+                }
+
+                // Draw jets
+                for (Jet jet : jets) {
+                    batch.draw(jet.texture, jet.bounds.x, jet.bounds.y);
+                }
+
+                // Update lizard position with jumping physics
+                applyGravity(delta);
+                handleInput();
+                checkCollisions();
+
+                // Move jets
+                moveJets(delta);
+            } else {
+                // Set the game over background color to black
+                ScreenUtils.clear(0, 0, 0, 1);
+                drawGameOver();
+                if (Gdx.input.isTouched()) {
+                    resetGame();
+                }
+            }
         }
-        batch.end();
 
-        handleInput();
+        batch.end();
+    }
+
+    private void drawGameOver() {
+        gameOverFont.draw(batch, "Game Over!", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2 + 50);
+        gameOverFont.draw(batch, "Tap to Respawn", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2);
+    }
+
+    private void applyGravity(float delta) {
+        // Update vertical velocity with gravity and apply to lizard's Y position
+        lizardVelocityY += gravity * delta;
+        lizardY += lizardVelocityY * delta;
+
+        // Keep lizard within screen bounds
+        if (lizardY < 0) {
+            lizardY = 0;
+            lizardVelocityY = 0;
+        } else if (lizardY + lizardRightTexture.getHeight() > Gdx.graphics.getHeight()) {
+            lizardY = Gdx.graphics.getHeight() - lizardRightTexture.getHeight();
+            lizardVelocityY = 0;
+        }
+
+        lizardBounds.setPosition(lizardX, lizardY);
     }
 
     private void handleInput() {
-        if (!isGameOver) {
-            if (Gdx.input.isTouched()) {
-                Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-                touchPos.y = Gdx.graphics.getHeight() - touchPos.y; // Invert y-axis
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
+            lizardVelocityY = jumpVelocity;
+        }
+    }
 
-                // Move lizard based on touch position
-                lizardX = touchPos.x - lizardRightTexture.getWidth() / 2;
-                lizardY = touchPos.y - lizardRightTexture.getHeight() / 2;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                lizardX = lizardX - 1;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                lizardX = lizardX + 1;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                lizardY = lizardY + 1;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                lizardY = lizardY - 1;
-            }
-            lizardBounds.setPosition(lizardX, lizardY);
+    private void updateCoins(float delta) {
+        for (int i = 0; i < coins.size(); i++) {
+            Rectangle coin = coins.get(i);
+            coin.x -= coinScrollSpeed;
 
-            // Update bounds
-            lizardBounds.setPosition(lizardX, lizardY);
+            if (coin.x < -coin.width) {
+                coin.x = Gdx.graphics.getWidth();
+                coin.y = random.nextFloat() * (Gdx.graphics.getHeight() - coin.height);
+            }
+        }
+    }
+
+    private void moveJets(float delta) {
+        for (int i = 0; i < jets.size(); i++) {
+            Jet jet = jets.get(i);
+            jet.bounds.x += jet.speed * delta;
+
+            if ((jet.speed > 0 && jet.bounds.x > Gdx.graphics.getWidth()) ||
+                (jet.speed < 0 && jet.bounds.x + jet.bounds.width < 0)) {
+                jets.remove(i);
+                i--;
+                spawnJet();
+            }
         }
     }
 
     private void checkCollisions() {
-        // Check for coin collisions
         for (int i = 0; i < coins.size(); i++) {
             Rectangle coin = coins.get(i);
             if (lizardBounds.overlaps(coin)) {
-                // Remove the coin and increment the score
                 coins.remove(i);
                 score++;
-                spawnCoins(); // Spawn new coins after collecting one
-                break; // Exit loop after collecting a coin
+                spawnCoins();
+                break;
             }
         }
 
-        // Check for spikes (not implemented, but you'd check similar to coins)
-        // If there are spikes, check if lizard collides with them and call gameOver();
+        for (Jet jet : jets) {
+            if (lizardBounds.overlaps(jet.bounds)) {
+                gameOver();
+                break;
+            }
+        }
     }
 
     private void gameOver() {
@@ -177,11 +251,28 @@ public class GameScreen implements Screen {
 
     public void dispose() {
         batch.dispose();
+        font.dispose();
+        gameOverFont.dispose();
         cityBackground.dispose();
         coinTexture.dispose();
-        lizardLeftTexture.dispose();
         lizardRightTexture.dispose();
-        spikeTexture.dispose();
-        gameOverTexture.dispose();
+
+        // Dispose jet textures to prevent memory leaks
+        for (Jet jet : jets) {
+            jet.texture.dispose();
+        }
+    }
+
+    // Jet class to handle jet properties
+    private class Jet {
+        Rectangle bounds;
+        Texture texture;
+        float speed;
+
+        Jet(float x, float y, float speed, Texture texture) {
+            this.bounds = new Rectangle(x, y, 64, 64); // Assuming jet size is 64x64
+            this.speed = speed;
+            this.texture = texture; // Set the texture for the jet
+        }
     }
 }
