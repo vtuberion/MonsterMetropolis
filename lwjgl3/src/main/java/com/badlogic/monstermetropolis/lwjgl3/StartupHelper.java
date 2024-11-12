@@ -14,7 +14,7 @@
  */
 //Note, the above license and copyright applies to this file only.
 
-package com.badlogic.monstermetrodraft.lwjgl3;
+package com.badlogic.monstermetropolis.lwjgl3;
 
 import org.lwjgl.system.macosx.LibC;
 

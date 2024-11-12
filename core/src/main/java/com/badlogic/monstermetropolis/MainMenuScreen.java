@@ -1,4 +1,4 @@
-package com.badlogic.monstermetrodraft;
+package com.badlogic.monstermetropolis;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

@@ -1,8 +1,8 @@
-package com.badlogic.monstermetrodraft.lwjgl3;
+package com.badlogic.monstermetropolis.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.monstermetrodraft.monstermetropolis;
+import com.badlogic.monstermetropolis.monstermetropolis;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {

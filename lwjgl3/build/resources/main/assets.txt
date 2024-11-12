@@ -2,6 +2,7 @@ building1.png
 building2.png
 building3.png
 city_background.png
+coin-recieved.mp3
 coin.png
 dino_left.piskel
 dino_left.png
@@ -9,4 +10,3 @@ dino_right.piskel
 dino_right.png
 jet_left.png
 jet_right.png
-spike.png
