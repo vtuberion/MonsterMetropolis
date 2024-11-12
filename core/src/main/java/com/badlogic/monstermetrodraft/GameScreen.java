@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -22,8 +23,9 @@ public class GameScreen implements Screen {
     private Texture cityBackground;
     private Texture coinTexture;
     private Texture dinoRightTexture;
+    private Texture[] buildingTextures;
 
-    // Sprites and Positions
+    // Sprite and position data
     private Rectangle dinobounds;
     private float dinoX, dinoY;
     private float lizardVelocityY = 0;
@@ -32,37 +34,47 @@ public class GameScreen implements Screen {
     private boolean isGameOver;
     private boolean isGameStarted;
 
-    // Lists for coins and jets
+    // Lists for coins, jets, and buildings
     private List<Rectangle> coins;
     private List<Jet> jets;
+    private List<Buildings> buildings;
     private int score;
     private Random random;
 
-    // Scrolling background and coin variables
+    // Scrolling background variables
     private float bgScrollSpeed = 4.0f;
-    private float coinScrollSpeed = 2.0f; // Slower than the background
+    private float coinScrollSpeed = 2.0f;
     private float bgOffset = 0;
+
+    // Building spawn variables
+    private float buildingSpawnTimer = 0f;
+    private float buildingSpawnDelay = 2f; // Spawn a new building every 2 seconds
 
     public GameScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
         this.font = new BitmapFont(); // Use default font for simplicity
         this.gameOverFont = new BitmapFont(); // Initialize game over font
-
-        // Set font size for game over screen (you can adjust the size)
-        gameOverFont.getData().setScale(2.0f); // Increase font size
+        gameOverFont.getData().setScale(2.0f); // Increase font size for game over text
 
         // Load assets
         cityBackground = new Texture("city_background.png");
         coinTexture = new Texture("coin.png");
         dinoRightTexture = new Texture("dino_right.png");
 
+        // Initialize building textures array
+        buildingTextures = new Texture[]{
+            new Texture("building1.png"),
+            new Texture("building2.png"),
+            new Texture("building3.png")
+        };
+
         resetGame();
     }
 
     private void resetGame() {
         dinoX = 50;
-        dinoY = 0; // Set to 0 to spawn on the ground
+        dinoY = 0;
         dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth(), dinoRightTexture.getHeight());
         lizardVelocityY = 0;
         isGameOver = false;
@@ -75,8 +87,12 @@ public class GameScreen implements Screen {
         random = new Random();
         spawnCoins();
         spawnJet();
-    }
 
+        // Initialize and place buildings
+        buildings = new ArrayList<>();
+        spawnBuildings(1); // Spawn 1 building initially
+        buildingSpawnTimer = 0f; // Reset the building spawn timer
+    }
 
     private void spawnCoins() {
         while (coins.size() < 3) {
@@ -88,30 +104,33 @@ public class GameScreen implements Screen {
     }
 
     private void spawnJet() {
-        // Define the height of the jet texture (adjust if needed)
         float jetHeight = 64;
-
-        // Spawn jets only above half the screen height, while ensuring they don't overflow
         float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
         boolean fromLeft = random.nextBoolean();
 
         float jetX = fromLeft ? -dinoRightTexture.getWidth() : Gdx.graphics.getWidth();
-        float speed = fromLeft ? 300 : -300; // Faster speed for jets
-        Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png"); // Use appropriate jet texture
+        float speed = fromLeft ? 300 : -300;
+        Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png");
 
-        jets.add(new Jet(jetX, jetY, speed, jetTexture)); // Pass jet texture to Jet constructor
+        jets.add(new Jet(jetX, jetY, speed, jetTexture));
     }
 
-
+    private void spawnBuildings(int count) {
+        for (int i = 0; i < count; i++) {
+            float buildingX = Gdx.graphics.getWidth();
+            float buildingY = 0;
+            Texture texture = buildingTextures[MathUtils.random(buildingTextures.length - 1)];
+            Buildings building = new Buildings(texture, buildingX, buildingY, 200, 300, -100);
+            buildings.add(building);
+        }
+    }
 
     @Override
     public void show() {}
 
     @Override
     public void render(float delta) {
-        // Clear screen
-        ScreenUtils.clear(0, 0, 0, 1); // Clear screen color
-
+        ScreenUtils.clear(0, 0, 0, 1);
         batch.begin();
 
         if (!isGameStarted) {
@@ -119,41 +138,44 @@ public class GameScreen implements Screen {
                 isGameStarted = true;
             }
         } else {
-            // Update background scroll
             bgOffset += bgScrollSpeed * delta;
             if (bgOffset > cityBackground.getWidth()) {
                 bgOffset -= cityBackground.getWidth();
             }
 
-            // Draw the background twice for seamless scrolling
             batch.draw(cityBackground, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.draw(cityBackground, -bgOffset + cityBackground.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             if (!isGameOver) {
-                // Draw the lizard
                 batch.draw(dinoRightTexture, dinoX, dinoY);
 
-                // Draw and update coins
                 updateCoins(delta);
                 for (Rectangle coin : coins) {
                     batch.draw(coinTexture, coin.x, coin.y);
                 }
 
-                // Draw jets
                 for (Jet jet : jets) {
                     batch.draw(jet.texture, jet.bounds.x, jet.bounds.y);
                 }
 
-                // Update lizard position with jumping physics
+                // Update and render buildings
+                for (Buildings building : buildings) {
+                    building.updatePosition(delta);
+                    building.render(batch);
+                }
+
+                // Spawn new buildings periodically
+                buildingSpawnTimer += delta;
+                if (buildingSpawnTimer >= buildingSpawnDelay) {
+                    buildingSpawnTimer = 0f;
+                    spawnBuildings(1); // Spawn 1 new building
+                }
+
                 applyGravity(delta);
                 handleInput();
                 checkCollisions();
-
-                // Move jets
                 moveJets(delta);
             } else {
-                // Set the game over background color to black
-                ScreenUtils.clear(0, 0, 0, 1);
                 drawGameOver();
                 if (Gdx.input.isTouched()) {
                     resetGame();
@@ -170,11 +192,9 @@ public class GameScreen implements Screen {
     }
 
     private void applyGravity(float delta) {
-        // Update vertical velocity with gravity and apply to lizard's Y position
         lizardVelocityY += gravity * delta;
         dinoY += lizardVelocityY * delta;
 
-        // Keep lizard within screen bounds
         if (dinoY < 0) {
             dinoY = 0;
             lizardVelocityY = 0;
@@ -193,10 +213,8 @@ public class GameScreen implements Screen {
     }
 
     private void updateCoins(float delta) {
-        for (int i = 0; i < coins.size(); i++) {
-            Rectangle coin = coins.get(i);
+        for (Rectangle coin : coins) {
             coin.x -= coinScrollSpeed;
-
             if (coin.x < -coin.width) {
                 coin.x = Gdx.graphics.getWidth();
                 coin.y = random.nextFloat() * (Gdx.graphics.getHeight() - coin.height);
@@ -241,14 +259,19 @@ public class GameScreen implements Screen {
         isGameOver = true;
     }
 
+    @Override
     public void resize(int width, int height) {}
 
+    @Override
     public void pause() {}
 
+    @Override
     public void resume() {}
 
+    @Override
     public void hide() {}
 
+    @Override
     public void dispose() {
         batch.dispose();
         font.dispose();
@@ -257,22 +280,25 @@ public class GameScreen implements Screen {
         coinTexture.dispose();
         dinoRightTexture.dispose();
 
-        // Dispose jet textures to prevent memory leaks
+        for (Texture texture : buildingTextures) {
+            texture.dispose();
+        }
+
         for (Jet jet : jets) {
             jet.texture.dispose();
         }
     }
 
-    // Jet class to handle jet properties
+    // Jet class to manage jet properties
     private class Jet {
         Rectangle bounds;
         Texture texture;
         float speed;
 
         Jet(float x, float y, float speed, Texture texture) {
-            this.bounds = new Rectangle(x, y, 64, 64); // Assuming jet size is 64x64
+            this.bounds = new Rectangle(x, y, 64, 64);
             this.speed = speed;
-            this.texture = texture; // Set the texture for the jet
+            this.texture = texture;
         }
     }
 }
