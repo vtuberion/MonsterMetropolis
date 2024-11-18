@@ -18,11 +18,15 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private BitmapFont font;
     private BitmapFont gameOverFont;
+    private float damageCooldown = 1f; // 1 second cooldown
+    private float damageTimer = 0f;
 
     // Textures
     private Texture cityBackground;
     private Texture coinTexture;
     private Texture dinoRightTexture;
+    private Texture heartTexture;
+    private Texture halfHeartTexture;
     private Texture[] buildingTextures;
 
     // Sprite and position data
@@ -39,6 +43,7 @@ public class GameScreen implements Screen {
     private List<Jet> jets;
     private List<Buildings> buildings;
     private int score;
+    private int lives;
     private Random random;
 
     // Scrolling background variables
@@ -61,6 +66,8 @@ public class GameScreen implements Screen {
         cityBackground = new Texture("city_background.png");
         coinTexture = new Texture("coin.png");
         dinoRightTexture = new Texture("dino_right.png");
+        heartTexture = new Texture("heart.png");
+        halfHeartTexture = new Texture("half-heart.png");
 
         // Initialize building textures array
         buildingTextures = new Texture[]{
@@ -80,6 +87,7 @@ public class GameScreen implements Screen {
         isGameOver = false;
         isGameStarted = false;
         score = 0;
+        lives = 6;
 
         // Initialize coins and jets
         coins = new ArrayList<>();
@@ -170,7 +178,8 @@ public class GameScreen implements Screen {
                     buildingSpawnTimer = 0f;
                     spawnBuildings(1); // Spawn 1 new building
                 }
-
+                updateCooldown(delta);
+                drawLives();
                 applyGravity(delta);
                 handleInput();
                 checkCollisions();
@@ -190,7 +199,14 @@ public class GameScreen implements Screen {
         gameOverFont.draw(batch, "Game Over!", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2 + 50);
         gameOverFont.draw(batch, "Tap to Respawn", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2);
     }
-
+    private void drawLives() {
+        for (int i = 0; i < lives / 2; i++) {
+            batch.draw(heartTexture, 10 + i * 40, Gdx.graphics.getHeight() - 40, 32, 32);
+        }
+        if (lives % 2 != 0) {
+            batch.draw(halfHeartTexture, 10 + (lives / 2) * 40, Gdx.graphics.getHeight() - 40, 32, 32);
+        }
+    }
     private void applyGravity(float delta) {
         lizardVelocityY += gravity * delta;
         dinoY += lizardVelocityY * delta;
@@ -249,12 +265,26 @@ public class GameScreen implements Screen {
 
         for (Jet jet : jets) {
             if (dinobounds.overlaps(jet.bounds)) {
-                gameOver();
+                loseLife();
                 break;
             }
         }
     }
+    private void updateCooldown(float delta) {
+        if (damageTimer > 0) {
+            damageTimer -= delta;
+        }
+    }
 
+    private void loseLife() {
+        if (damageTimer <= 0 && lives > 0) {
+            lives--; // Decrement lives
+            damageTimer = damageCooldown; // Reset cooldown
+            if (lives == 0) {
+                gameOver();
+            }
+        }
+    }
     private void gameOver() {
         isGameOver = true;
     }
@@ -279,7 +309,8 @@ public class GameScreen implements Screen {
         cityBackground.dispose();
         coinTexture.dispose();
         dinoRightTexture.dispose();
-
+        heartTexture.dispose();
+        halfHeartTexture.dispose();
         for (Texture texture : buildingTextures) {
             texture.dispose();
         }

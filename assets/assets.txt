@@ -8,5 +8,7 @@ dino_left.piskel
 dino_left.png
 dino_right.piskel
 dino_right.png
+half-heart.png
+heart.png
 jet_left.png
 jet_right.png
