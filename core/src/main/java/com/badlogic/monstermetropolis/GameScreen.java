@@ -42,6 +42,7 @@ public class GameScreen implements Screen {
     private List<Rectangle> coins;
     private List<Jet> jets;
     private List<Buildings> buildings;
+    private List<Explosion> explosions;
     private int score;
     private int lives;
     private Random random;
@@ -92,6 +93,7 @@ public class GameScreen implements Screen {
         // Initialize coins and jets
         coins = new ArrayList<>();
         jets = new ArrayList<>();
+        explosions = new ArrayList<>();
         random = new Random();
         spawnCoins();
         spawnJet();
@@ -153,19 +155,19 @@ public class GameScreen implements Screen {
 
             batch.draw(cityBackground, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.draw(cityBackground, -bgOffset + cityBackground.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
             if (!isGameOver) {
-                batch.draw(dinoRightTexture, dinoX, dinoY);
+                batch.draw(dinoRightTexture, dinoX, dinoY,
+                    dinoRightTexture.getWidth() * 2, dinoRightTexture.getHeight() * 2);
 
                 updateCoins(delta);
                 for (Rectangle coin : coins) {
-                    batch.draw(coinTexture, coin.x, coin.y);
+                    batch.draw(coinTexture, coin.x, coin.y,
+                        coinTexture.getWidth() * 2, coinTexture.getHeight() * 2);
                 }
-
+                game.font.draw(batch, "Score: " + score, Gdx.graphics.getWidth()-100, Gdx.graphics.getHeight()-10);
                 for (Jet jet : jets) {
                     batch.draw(jet.texture, jet.bounds.x, jet.bounds.y);
                 }
-
                 // Update and render buildings
                 for (Buildings building : buildings) {
                     building.updatePosition(delta);
@@ -191,6 +193,17 @@ public class GameScreen implements Screen {
                 }
             }
         }
+        // Update explosions
+        for (int i = 0; i < explosions.size(); i++) {
+            Explosion explosion = explosions.get(i);
+            explosion.update(delta);
+            if (explosion.isFinished()) {
+                explosions.remove(i);
+                i--;
+            } else {
+                explosion.render(batch);
+            }
+        }
 
         batch.end();
     }
@@ -201,10 +214,10 @@ public class GameScreen implements Screen {
     }
     private void drawLives() {
         for (int i = 0; i < lives / 2; i++) {
-            batch.draw(heartTexture, 10 + i * 40, Gdx.graphics.getHeight() - 40, 32, 32);
+            batch.draw(heartTexture, 10 + i * 40, Gdx.graphics.getHeight() - 40, 64, 64);
         }
         if (lives % 2 != 0) {
-            batch.draw(halfHeartTexture, 10 + (lives / 2) * 40, Gdx.graphics.getHeight() - 40, 32, 32);
+            batch.draw(halfHeartTexture, 10 + (lives / 2) * 40, Gdx.graphics.getHeight() - 40, 64, 64);
         }
     }
     private void applyGravity(float delta) {
@@ -265,7 +278,17 @@ public class GameScreen implements Screen {
 
         for (Jet jet : jets) {
             if (dinobounds.overlaps(jet.bounds)) {
+                explosions.add(new Explosion(jet.bounds.x, jet.bounds.y, 64, 1.0f));
+                jets.remove(jet);
                 loseLife();
+                break;
+            }
+        }
+        for (Buildings building : buildings) {
+            if (dinobounds.overlaps(building.getBounds())) {
+                explosions.add(new Explosion(building.getBounds().x, building.getBounds().y, 128, 1.0f)); // Larger explosion for buildings
+                buildings.remove(building);
+                score++;
                 break;
             }
         }
