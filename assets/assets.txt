@@ -15,5 +15,8 @@ half-heart.png
 heart.png
 jet_left.png
 jet_right.png
+nyc_background.png
+paris_background.jpg
 tank_left.png
 tank_right.png
+tokyo_background.png

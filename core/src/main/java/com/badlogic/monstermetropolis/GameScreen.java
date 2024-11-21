@@ -23,6 +23,8 @@ public class GameScreen implements Screen {
 
     // Textures
     private Texture cityBackground;
+    private Texture cityBackground2;
+    private Texture cityBackground3;
     private Texture coinTexture;
     private Texture dinoRightTexture;
     private Texture heartTexture;
@@ -64,7 +66,12 @@ public class GameScreen implements Screen {
         gameOverFont.getData().setScale(2.0f); // Increase font size for game over text
 
         // Load assets
-        cityBackground = new Texture("city_background.png");
+        cityBackground = new Texture("nyc_background.png");
+        //https://img.freepik.com/free-photo/8-bit-graphics-pixels-scene-with-city-sunset_23-2151120910.jpg
+        cityBackground2 = new Texture("paris_background.jpg");
+        //https://i.pinimg.com/736x/7b/e7/64/7be7647ef1d6ba714dce5e451ccfa354.jpg
+        cityBackground3 = new Texture("tokyo_background.png");
+        //https://preview.redd.it/tokyo-tower-v0-tys6oq2smz091.png?auto=webp&s=3f400039932128dd5eff05b98fbae12707e318d9
         coinTexture = new Texture("coin.png");
         dinoRightTexture = new Texture("dino_right.png");
         heartTexture = new Texture("heart.png");
