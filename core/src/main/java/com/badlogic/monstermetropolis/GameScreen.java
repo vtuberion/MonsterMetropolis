@@ -218,7 +218,7 @@ public class GameScreen implements Screen {
         if(jets.size()<2) {
             spawnJet();
         }
-        else if(score>30 && jets.size()<4){ //Possible condition for modifying difficulty
+        else if(score>10 && jets.size()<4){ //Possible condition for modifying difficulty
             // (increase jet spawns/spawn a new enemy type)
             spawnJet();
         }
