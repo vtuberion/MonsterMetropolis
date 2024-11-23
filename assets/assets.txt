@@ -3,7 +3,6 @@ airliner-right.png
 building1.png
 building2.png
 building3.png
-city_background.png
 coin-recieved.mp3
 coin.png
 dino_left.piskel
@@ -13,10 +12,12 @@ dino_right.png
 explosion.png
 half-heart.png
 heart.png
+helicopter.png
 jet_left.png
 jet_right.png
 nyc_background.png
 paris_background.jpg
+road.png
 tank_left.png
 tank_right.png
 tokyo_background.png

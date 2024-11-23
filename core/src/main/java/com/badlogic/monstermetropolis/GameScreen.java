@@ -20,9 +20,18 @@ public class GameScreen implements Screen {
     private BitmapFont gameOverFont;
     private float damageCooldown = 1f; // 1 second cooldown
     private float damageTimer = 0f;
+    // Timer variables
+    private float timeRemaining = 30f; // 3 minutes in seconds
+    private boolean isTimeUp = false;
+    private String currentBackground = "NYC"; // Starting background
+
+
+    private Texture[] backgrounds;
+
+    private boolean backgroundSwitched = false;
 
     // Textures
-    private Texture cityBackground;
+    private Texture cityBackground1;
     private Texture cityBackground2;
     private Texture cityBackground3;
     private Texture coinTexture;
@@ -57,7 +66,8 @@ public class GameScreen implements Screen {
     // Building spawn variables
     private float buildingSpawnTimer = 0f;
     private float buildingSpawnDelay = 2f; // Spawn a new building every 2 seconds
-
+    private boolean firstSwitchDone;
+    private boolean secondSwitchDone;
     public GameScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
@@ -66,12 +76,17 @@ public class GameScreen implements Screen {
         gameOverFont.getData().setScale(2.0f); // Increase font size for game over text
 
         // Load assets
-        cityBackground = new Texture("nyc_background.png");
+        cityBackground1 = new Texture("nyc_background.png");
         //https://img.freepik.com/free-photo/8-bit-graphics-pixels-scene-with-city-sunset_23-2151120910.jpg
         cityBackground2 = new Texture("paris_background.jpg");
         //https://i.pinimg.com/736x/7b/e7/64/7be7647ef1d6ba714dce5e451ccfa354.jpg
         cityBackground3 = new Texture("tokyo_background.png");
         //https://preview.redd.it/tokyo-tower-v0-tys6oq2smz091.png?auto=webp&s=3f400039932128dd5eff05b98fbae12707e318d9
+        backgrounds = new Texture[]{
+            cityBackground1,
+            cityBackground2,
+            cityBackground3
+        };
         coinTexture = new Texture("coin.png");
         dinoRightTexture = new Texture("dino_right.png");
         heartTexture = new Texture("heart.png");
@@ -123,11 +138,9 @@ public class GameScreen implements Screen {
     private void spawnJet() {
         float jetHeight = 64;
         float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
-        boolean fromLeft = random.nextBoolean();
-
-        float jetX = fromLeft ? -dinoRightTexture.getWidth() : Gdx.graphics.getWidth();
-        float speed = fromLeft ? 300 : -300;
-        Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png");
+        float jetX = Gdx.graphics.getWidth();
+        float speed = -300;
+        Texture jetTexture = new Texture("jet_left.png");
 
         jets.add(new Jet(jetX, jetY, speed, jetTexture));
     }
@@ -155,14 +168,19 @@ public class GameScreen implements Screen {
                 isGameStarted = true;
             }
         } else {
-            bgOffset += bgScrollSpeed * delta;
-            if (bgOffset > cityBackground.getWidth()) {
-                bgOffset -= cityBackground.getWidth();
-            }
-
-            batch.draw(cityBackground, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            batch.draw(cityBackground, -bgOffset + cityBackground.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             if (!isGameOver) {
+                // Update timer
+                updateTimer(delta);
+
+                // Scroll background logic
+                bgOffset += bgScrollSpeed * delta;
+                if (bgOffset > cityBackground1.getWidth()) {
+                    bgOffset -= cityBackground1.getWidth();
+                }
+
+                batch.draw(cityBackground1, -bgOffset, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                batch.draw(cityBackground1, -bgOffset + cityBackground1.getWidth(), 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
                 batch.draw(dinoRightTexture, dinoX, dinoY,
                     dinoRightTexture.getWidth() * 2, dinoRightTexture.getHeight() * 2);
 
@@ -171,11 +189,14 @@ public class GameScreen implements Screen {
                     batch.draw(coinTexture, coin.x, coin.y,
                         coinTexture.getWidth() * 2, coinTexture.getHeight() * 2);
                 }
-                game.font.draw(batch, "Score: " + score, Gdx.graphics.getWidth()-100, Gdx.graphics.getHeight()-10);
+
+                game.font.draw(batch, "Score: " + score, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 10);
+                drawTimer(); // Draw the countdown timer
+
                 for (Jet jet : jets) {
                     batch.draw(jet.texture, jet.bounds.x, jet.bounds.y);
                 }
-                // Update and render buildings
+
                 for (Buildings building : buildings) {
                     building.updatePosition(delta);
                     building.render(batch);
@@ -187,6 +208,7 @@ public class GameScreen implements Screen {
                     buildingSpawnTimer = 0f;
                     spawnBuildings(1); // Spawn 1 new building
                 }
+
                 updateCooldown(delta);
                 drawLives();
                 applyGravity(delta);
@@ -199,20 +221,65 @@ public class GameScreen implements Screen {
                     resetGame();
                 }
             }
-        }
-        // Update explosions
-        for (int i = 0; i < explosions.size(); i++) {
-            Explosion explosion = explosions.get(i);
-            explosion.update(delta);
-            if (explosion.isFinished()) {
-                explosions.remove(i);
-                i--;
-            } else {
-                explosion.render(batch);
+
+            for (int i = 0; i < explosions.size(); i++) {
+                Explosion explosion = explosions.get(i);
+                explosion.update(delta);
+                if (explosion.isFinished()) {
+                    explosions.remove(i);
+                    i--;
+                } else {
+                    explosion.render(batch);
+                }
             }
         }
 
         batch.end();
+    }
+
+    // Update the timer
+    private void updateTimer(float delta) {
+        // Decrease the time remaining for the current background
+        timeRemaining -= delta;
+
+        if (timeRemaining <= 0) {
+            // Transition to the next background based on the current state
+            switch (currentBackground) {
+                case "NYC":
+                    cityBackground1 = cityBackground2; // Switch to Paris background
+                    currentBackground = "Paris";
+                    break;
+
+                case "Paris":
+                    cityBackground1 = cityBackground3; // Switch to Tokyo background
+                    currentBackground = "Tokyo";
+                    break;
+
+                case "Tokyo":
+                    cityBackground1 = cityBackground1; // Switch back to NYC background
+                    currentBackground = "NYC";
+                    break;
+            }
+
+            // Reset the timer for the new background
+            timeRemaining = 30f; // Each background lasts for 30 seconds
+        }
+    }
+
+
+    private void resetTimer() {
+        timeRemaining = 15f; // Reset the timer (set to desired total starting time)
+        isTimeUp = false; // Reset the timer state
+        firstSwitchDone = false; // Reset the first background switch flag
+        secondSwitchDone = false; // Reset the second background switch flag
+    }
+
+    // Draw the timer on screen
+    private void drawTimer() {
+        int minutes = (int) (timeRemaining / 60);
+        int seconds = (int) (timeRemaining % 60);
+        String timerText = String.format("Time: %02d:%02d", minutes, seconds);
+        game.font.draw(batch, timerText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 30);
     }
 
     private void drawGameOver() {
@@ -259,21 +326,21 @@ public class GameScreen implements Screen {
     }
 
     private void moveJets(float delta) {
-        for (int i = 0; i < jets.size(); i++) {
+        for (int i = jets.size() - 1; i >= 0; i--) {
             Jet jet = jets.get(i);
             jet.bounds.x += jet.speed * delta;
 
             if ((jet.speed > 0 && jet.bounds.x > Gdx.graphics.getWidth()) ||
                 (jet.speed < 0 && jet.bounds.x + jet.bounds.width < 0)) {
                 jets.remove(i);
-                i--;
-                spawnJet();
+                spawnJet(); // Spawn a new jet when one leaves the screen
             }
         }
     }
 
+
     private void checkCollisions() {
-        for (int i = 0; i < coins.size(); i++) {
+        for (int i = coins.size() - 1; i >= 0; i--) {
             Rectangle coin = coins.get(i);
             if (dinobounds.overlaps(coin)) {
                 coins.remove(i);
@@ -283,23 +350,28 @@ public class GameScreen implements Screen {
             }
         }
 
-        for (Jet jet : jets) {
+        for (int i = jets.size() - 1; i >= 0; i--) {
+            Jet jet = jets.get(i);
             if (dinobounds.overlaps(jet.bounds)) {
                 explosions.add(new Explosion(jet.bounds.x, jet.bounds.y, 64, 1.0f));
-                jets.remove(jet);
+                jets.remove(i); // Remove the jet safely
+                spawnJet(); // Spawn a new jet after collision
                 loseLife();
                 break;
             }
         }
-        for (Buildings building : buildings) {
+
+        for (int i = buildings.size() - 1; i >= 0; i--) {
+            Buildings building = buildings.get(i);
             if (dinobounds.overlaps(building.getBounds())) {
-                explosions.add(new Explosion(building.getBounds().x, building.getBounds().y, 128, 1.0f)); // Larger explosion for buildings
-                buildings.remove(building);
+                explosions.add(new Explosion(building.getBounds().x + 75, building.getBounds().y + 50, 128, 1.0f));
+                buildings.remove(i); // Remove the building safely
                 score++;
                 break;
             }
         }
     }
+
     private void updateCooldown(float delta) {
         if (damageTimer > 0) {
             damageTimer -= delta;
@@ -336,7 +408,7 @@ public class GameScreen implements Screen {
         batch.dispose();
         font.dispose();
         gameOverFont.dispose();
-        cityBackground.dispose();
+        cityBackground1.dispose();
         coinTexture.dispose();
         dinoRightTexture.dispose();
         heartTexture.dispose();
