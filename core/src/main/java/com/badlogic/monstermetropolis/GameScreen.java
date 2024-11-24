@@ -1,7 +1,6 @@
 package com.badlogic.monstermetropolis;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +57,6 @@ public class GameScreen implements Screen {
     // Building spawn variables
     private float buildingSpawnTimer = 0f;
     private float buildingSpawnDelay = 2f; // Spawn a new building every 2 seconds
-
-    private long lastJetTime;
 
     public GameScreen(final monstermetropolis game) {
         this.game = game;
@@ -127,13 +123,13 @@ public class GameScreen implements Screen {
     private void spawnJet() {
         float jetHeight = 64;
         float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
-        float jetX = 0; // initialize the jetX variable
-        jetX=Gdx.graphics.getWidth(); //Set the jet sprite's x to spawn off the screen
-        float speed = -300;
-        Texture jetTexture =  new Texture("jet_left.png");
+        boolean fromLeft = random.nextBoolean();
 
-        jets.add(new Jet(jetX, jetY, speed, jetTexture)); // Add the new jet sprite to a list of jet sprites
-        lastJetTime = TimeUtils.millis();
+        float jetX = fromLeft ? -dinoRightTexture.getWidth() : Gdx.graphics.getWidth();
+        float speed = fromLeft ? 300 : -300;
+        Texture jetTexture = fromLeft ? new Texture("jet_right.png") : new Texture("jet_left.png");
+
+        jets.add(new Jet(jetX, jetY, speed, jetTexture));
     }
 
     private void spawnBuildings(int count) {
@@ -215,13 +211,6 @@ public class GameScreen implements Screen {
                 explosion.render(batch);
             }
         }
-        if(jets.size()<2) {
-            spawnJet();
-        }
-        else if(score>30 && jets.size()<4){ //Possible condition for modifying difficulty
-            // (increase jet spawns/spawn a new enemy type)
-            spawnJet();
-        }
 
         batch.end();
     }
@@ -254,7 +243,7 @@ public class GameScreen implements Screen {
     }
 
     private void handleInput() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
             lizardVelocityY = jumpVelocity;
         }
     }
