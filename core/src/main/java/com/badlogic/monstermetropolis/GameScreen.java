@@ -49,9 +49,9 @@ public class GameScreen implements Screen {
     private boolean isGameOver;
     private boolean isGameStarted;
 
-    // Lists for coins, jets, and buildings
+    // Lists for coins, airliners, and buildings
     private List<Rectangle> coins;
-    private List<Jet> jets;
+    private List<Airliner> airliners;
     private List<Buildings> buildings;
     private List<Explosion> explosions;
     private int score;
@@ -112,13 +112,13 @@ public class GameScreen implements Screen {
         score = 0;
         lives = 6;
 
-        // Initialize coins and jets
+        // Initialize coins and airliners
         coins = new ArrayList<>();
-        jets = new ArrayList<>();
+        airliners = new ArrayList<>();
         explosions = new ArrayList<>();
         random = new Random();
         spawnCoins();
-        spawnJet();
+        spawnAirliner();
 
         // Initialize and place buildings
         buildings = new ArrayList<>();
@@ -135,14 +135,14 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void spawnJet() {
-        float jetHeight = 64;
-        float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
-        float jetX = Gdx.graphics.getWidth();
+    private void spawnAirliner() {
+        float airlinerHeight = 64;
+        float airlinerY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - airlinerHeight) + (Gdx.graphics.getHeight() / 2);
+        float airlinerX = Gdx.graphics.getWidth();
         float speed = -300;
-        Texture jetTexture = new Texture("jet_left.png");
+        Texture airlinerTexture = new Texture("airliner-left.png");
 
-        jets.add(new Jet(jetX, jetY, speed, jetTexture));
+        airliners.add(new Airliner(airlinerX, airlinerY, speed, airlinerTexture));
     }
 
     private void spawnBuildings(int count) {
@@ -193,8 +193,8 @@ public class GameScreen implements Screen {
                 game.font.draw(batch, "Score: " + score, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 10);
                 drawTimer(); // Draw the countdown timer
 
-                for (Jet jet : jets) {
-                    batch.draw(jet.texture, jet.bounds.x, jet.bounds.y);
+                for (Airliner airliner : airliners) {
+                    batch.draw(airliner.texture, airliner.bounds.x, airliner.bounds.y);
                 }
 
                 for (Buildings building : buildings) {
@@ -214,7 +214,7 @@ public class GameScreen implements Screen {
                 applyGravity(delta);
                 handleInput();
                 checkCollisions();
-                moveJets(delta);
+                moveAirliners(delta);
             } else {
                 drawGameOver();
                 if (Gdx.input.isTouched()) {
@@ -233,10 +233,10 @@ public class GameScreen implements Screen {
                 }
             }
         }
-        if(jets.size()<2){
-            spawnJet();
-        }else if(score>30 && jets.size()<4){
-            spawnJet(); //Possible condition to increase difficulty by
+        if(airliners.size()<2){
+            spawnAirliner();
+        }else if(score>30 && airliners.size()<4){
+            spawnAirliner(); //Possible condition to increase difficulty by
             // spawning more enemies or different enemy types
         }
 
@@ -331,15 +331,15 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void moveJets(float delta) {
-        for (int i = jets.size() - 1; i >= 0; i--) {
-            Jet jet = jets.get(i);
-            jet.bounds.x += jet.speed * delta;
+    private void moveAirliners(float delta) {
+        for (int i = airliners.size() - 1; i >= 0; i--) {
+            Airliner airliner = airliners.get(i);
+            airliner.bounds.x += airliner.speed * delta;
 
-            if ((jet.speed > 0 && jet.bounds.x > Gdx.graphics.getWidth()) ||
-                (jet.speed < 0 && jet.bounds.x + jet.bounds.width < 0)) {
-                jets.remove(i);
-                spawnJet(); // Spawn a new jet when one leaves the screen
+            if ((airliner.speed > 0 && airliner.bounds.x > Gdx.graphics.getWidth()) ||
+                (airliner.speed < 0 && airliner.bounds.x + airliner.bounds.width < 0)) {
+                airliners.remove(i);
+                spawnAirliner(); // Spawn a new airliner when one leaves the screen
             }
         }
     }
@@ -356,12 +356,12 @@ public class GameScreen implements Screen {
             }
         }
 
-        for (int i = jets.size() - 1; i >= 0; i--) {
-            Jet jet = jets.get(i);
-            if (dinobounds.overlaps(jet.bounds)) {
-                explosions.add(new Explosion(jet.bounds.x, jet.bounds.y, 64, 1.0f));
-                jets.remove(i); // Remove the jet safely
-                spawnJet(); // Spawn a new jet after collision
+        for (int i = airliners.size() - 1; i >= 0; i--) {
+            Airliner airliner = airliners.get(i);
+            if (dinobounds.overlaps(airliner.bounds)) {
+                explosions.add(new Explosion(airliner.bounds.x, airliner.bounds.y, 64, 1.0f));
+                airliners.remove(i); // Remove the airliner safely
+                spawnAirliner(); // Spawn a new airliner after collision
                 loseLife();
                 break;
             }
@@ -423,18 +423,18 @@ public class GameScreen implements Screen {
             texture.dispose();
         }
 
-        for (Jet jet : jets) {
-            jet.texture.dispose();
+        for (Airliner airliner : airliners) {
+            airliner.texture.dispose();
         }
     }
 
-    // Jet class to manage jet properties
-    private class Jet {
+    // Airliner class to manage airliner properties
+    private class Airliner {
         Rectangle bounds;
         Texture texture;
         float speed;
 
-        Jet(float x, float y, float speed, Texture texture) {
+        Airliner(float x, float y, float speed, Texture texture) {
             this.bounds = new Rectangle(x, y, 64, 64);
             this.speed = speed;
             this.texture = texture;
