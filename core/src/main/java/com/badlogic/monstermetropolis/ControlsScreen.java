@@ -10,17 +10,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class MainMenuScreen implements Screen {
+public class ControlsScreen implements Screen {
     private final monstermetropolis game;
     private SpriteBatch batch;
     private BitmapFont font;
     private ShapeRenderer shapeRenderer;
-    private Rectangle startButtonBounds;
-    private Rectangle controlButtonBounds;
+    private Rectangle mainMenuButtonBounds;
     private GlyphLayout titleLayout;
     private GlyphLayout buttonLayout;
 
-    public MainMenuScreen(final monstermetropolis game) {
+    public ControlsScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
@@ -31,14 +30,8 @@ public class MainMenuScreen implements Screen {
         this.titleLayout = new GlyphLayout();
         this.buttonLayout = new GlyphLayout();
 
-        // Define the bounds for the start button
-        startButtonBounds = new Rectangle(
-            (Gdx.graphics.getWidth() - 200) / 2,
-            (Gdx.graphics.getHeight() - 60) / 2,
-            200,
-            60
-        );
-        controlButtonBounds = new Rectangle(
+        // Define the bounds for the resume button
+        mainMenuButtonBounds = new Rectangle(
             (Gdx.graphics.getWidth() - 200) / 2,
             (Gdx.graphics.getHeight()  / 2)-100,
             200,
@@ -63,10 +56,8 @@ public class MainMenuScreen implements Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         // Draw button background
         shapeRenderer.setColor(0.2f, 0.5f, 1.0f, 1);
-        shapeRenderer.rect(startButtonBounds.x, startButtonBounds.y,
-            startButtonBounds.width, startButtonBounds.height);
-        shapeRenderer.rect(controlButtonBounds.x, controlButtonBounds.y,
-            controlButtonBounds.width, controlButtonBounds.height);
+        shapeRenderer.rect(mainMenuButtonBounds.x, mainMenuButtonBounds.y,
+            mainMenuButtonBounds.width, mainMenuButtonBounds.height);
         shapeRenderer.end();
 
         // Then, draw all text
@@ -74,8 +65,7 @@ public class MainMenuScreen implements Screen {
 
         // Update layouts
         titleLayout.setText(font, "Monster Metropolis");
-        buttonLayout.setText(font, "START");
-        buttonLayout.setText(font, "Controls");
+        buttonLayout.setText(font, "Main Menu");
 
         // Draw title
         font.setColor(1, 1, 1, 1);
@@ -84,13 +74,9 @@ public class MainMenuScreen implements Screen {
             Gdx.graphics.getHeight()/2+100);
 
         // Draw button text
-        font.draw(batch, "START",
-            startButtonBounds.x + (startButtonBounds.width - buttonLayout.width) / 2,
-            startButtonBounds.y + (startButtonBounds.height + buttonLayout.height) / 2);
-        font.draw(batch, "Controls",
-            controlButtonBounds.x + (controlButtonBounds.width - buttonLayout.width) / 2,
-            controlButtonBounds.y + (controlButtonBounds.height + buttonLayout.height) / 2);
-
+        font.draw(batch, "Main Menu",
+            mainMenuButtonBounds.x + (mainMenuButtonBounds.width - buttonLayout.width) / 2,
+            mainMenuButtonBounds.y + (mainMenuButtonBounds.height + buttonLayout.height) / 2);
         batch.end();
 
         handleInput();
@@ -100,12 +86,8 @@ public class MainMenuScreen implements Screen {
         if (Gdx.input.isTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-            if (startButtonBounds.contains(touchX, touchY)) {
+            if (mainMenuButtonBounds.contains(touchX, touchY)) {
                 game.setScreen(new GameScreen(game));
-                dispose(); // Clean up this screen when switching
-            }
-            if (controlButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new ControlsScreen(game));
                 dispose(); // Clean up this screen when switching
             }
         }

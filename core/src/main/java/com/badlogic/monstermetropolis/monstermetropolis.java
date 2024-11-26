@@ -12,9 +12,10 @@ public class monstermetropolis extends Game {
         batch = new SpriteBatch();
         font = new BitmapFont();
         this.setScreen(new MainMenuScreen(this));
+        this.setScreen(new ControlsScreen(this));
     }
     public void render() {
-        super.render(); //important!
+        super.render();
     }
     @Override
     public void dispose() {
