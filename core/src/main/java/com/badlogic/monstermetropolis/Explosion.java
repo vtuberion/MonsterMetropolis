@@ -28,8 +28,4 @@ public class Explosion {
     public void render(Batch batch) {
         batch.draw(explosionTexture, bounds.x, bounds.y, bounds.width, bounds.height);
     }
-
-    public void dispose() {
-        explosionTexture.dispose();
-    }
 }

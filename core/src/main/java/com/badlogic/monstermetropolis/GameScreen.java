@@ -21,16 +21,15 @@ public class GameScreen implements Screen {
     private float damageCooldown = 1f; // 1 second cooldown
     private float damageTimer = 0f;
     // Timer variables
-    private float timeRemaining = 30f; // 3 minutes in seconds
-    private boolean isTimeUp = false;
+    private float timeRemaining = 30f; // 30 seconds
     private String currentBackground = "NYC"; // Starting background
 
 
     private Texture[] backgrounds;
 
-    private boolean backgroundSwitched = false;
 
     // Textures
+    private Texture background;
     private Texture cityBackground1;
     private Texture cityBackground2;
     private Texture cityBackground3;
@@ -44,8 +43,8 @@ public class GameScreen implements Screen {
     private Rectangle dinobounds;
     private float dinoX, dinoY;
     private float lizardVelocityY = 0;
-    private float gravity = -500f;
-    private float jumpVelocity = 250f;
+    private float gravity = -400f;
+    private float jumpVelocity = 400f;
     private boolean isGameOver;
     private boolean isGameStarted;
 
@@ -66,8 +65,6 @@ public class GameScreen implements Screen {
     // Building spawn variables
     private float buildingSpawnTimer = 0f;
     private float buildingSpawnDelay = 2f; // Spawn a new building every 2 seconds
-    private boolean firstSwitchDone;
-    private boolean secondSwitchDone;
     public GameScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
@@ -272,14 +269,6 @@ public class GameScreen implements Screen {
         }
     }
 
-
-    private void resetTimer() {
-        timeRemaining = 15f; // Reset the timer (set to desired total starting time)
-        isTimeUp = false; // Reset the timer state
-        firstSwitchDone = false; // Reset the first background switch flag
-        secondSwitchDone = false; // Reset the second background switch flag
-    }
-
     // Draw the timer on screen
     private void drawTimer() {
         int minutes = (int) (timeRemaining / 60);
@@ -370,7 +359,7 @@ public class GameScreen implements Screen {
         for (int i = buildings.size() - 1; i >= 0; i--) {
             Buildings building = buildings.get(i);
             if (dinobounds.overlaps(building.getBounds())) {
-                explosions.add(new Explosion(building.getBounds().x + 75, building.getBounds().y + 50, 128, 1.0f));
+                explosions.add(new Explosion(building.getBounds().x + 75, building.getBounds().y + 100, 128, 1.0f));
                 buildings.remove(i); // Remove the building safely
                 score++;
                 break;

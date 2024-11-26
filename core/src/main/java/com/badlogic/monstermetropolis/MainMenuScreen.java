@@ -16,6 +16,7 @@ public class MainMenuScreen implements Screen {
     private BitmapFont font;
     private ShapeRenderer shapeRenderer;
     private Rectangle startButtonBounds;
+    private Rectangle controlButtonBounds;
     private GlyphLayout titleLayout;
     private GlyphLayout buttonLayout;
 
@@ -34,6 +35,12 @@ public class MainMenuScreen implements Screen {
         startButtonBounds = new Rectangle(
             (Gdx.graphics.getWidth() - 200) / 2,
             (Gdx.graphics.getHeight() - 60) / 2,
+            200,
+            60
+        );
+        controlButtonBounds = new Rectangle(
+            (Gdx.graphics.getWidth() - 200) / 2,
+            (Gdx.graphics.getHeight()  / 2)-100,
             200,
             60
         );
@@ -58,6 +65,8 @@ public class MainMenuScreen implements Screen {
         shapeRenderer.setColor(0.2f, 0.5f, 1.0f, 1);
         shapeRenderer.rect(startButtonBounds.x, startButtonBounds.y,
             startButtonBounds.width, startButtonBounds.height);
+        shapeRenderer.rect(controlButtonBounds.x, controlButtonBounds.y,
+            controlButtonBounds.width, controlButtonBounds.height);
         shapeRenderer.end();
 
         // Then, draw all text
@@ -66,17 +75,21 @@ public class MainMenuScreen implements Screen {
         // Update layouts
         titleLayout.setText(font, "Monster Metropolis");
         buttonLayout.setText(font, "START");
+        buttonLayout.setText(font, "Controls");
 
         // Draw title
         font.setColor(1, 1, 1, 1);
         font.draw(batch, "Monster Metropolis",
             (Gdx.graphics.getWidth() - titleLayout.width) / 2,
-            Gdx.graphics.getHeight() - 50);
+            Gdx.graphics.getHeight()/2+100);
 
         // Draw button text
         font.draw(batch, "START",
             startButtonBounds.x + (startButtonBounds.width - buttonLayout.width) / 2,
             startButtonBounds.y + (startButtonBounds.height + buttonLayout.height) / 2);
+        font.draw(batch, "Controls",
+            controlButtonBounds.x + (controlButtonBounds.width - buttonLayout.width) / 2,
+            controlButtonBounds.y + (controlButtonBounds.height + buttonLayout.height) / 2);
 
         batch.end();
 
@@ -88,6 +101,10 @@ public class MainMenuScreen implements Screen {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (startButtonBounds.contains(touchX, touchY)) {
+                game.setScreen(new GameScreen(game));
+                dispose(); // Clean up this screen when switching
+            }
+            if (controlButtonBounds.contains(touchX, touchY)) {
                 game.setScreen(new GameScreen(game));
                 dispose(); // Clean up this screen when switching
             }

@@ -18,7 +18,7 @@ public class Buildings {
         this.width = width;
         this.height = height;
         this.speed = speed;
-        this.bounds = new Rectangle(x, y, width, height);
+        this.bounds = new Rectangle(x, y, width, height/2);
     }
 
     public void updatePosition(float delta) {
@@ -32,15 +32,5 @@ public class Buildings {
 
     public Rectangle getBounds() {
         return bounds;
-    }
-
-    public boolean isOffScreen(float screenWidth) {
-        return x + width < 0; // Returns true if the building is completely off the left side of the screen
-    }
-
-    public void dispose() {
-        if (texture != null) {
-            texture.dispose();
-        }
     }
 }
