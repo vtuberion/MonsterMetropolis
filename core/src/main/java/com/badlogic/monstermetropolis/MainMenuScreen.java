@@ -3,12 +3,12 @@ package com.badlogic.monstermetropolis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class MainMenuScreen implements Screen {
     private final monstermetropolis game;
@@ -18,20 +18,22 @@ public class MainMenuScreen implements Screen {
     private Rectangle startButtonBounds;
     private Rectangle controlButtonBounds;
     private GlyphLayout titleLayout;
-    private GlyphLayout buttonLayout;
+    private GlyphLayout startButtonLayout;
+    private GlyphLayout controlButtonLayout;
 
     public MainMenuScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
-        this.font.getData().setScale(2); // Make the font bigger
+        this.font.getData().setScale(2); // Increase font size for better visibility
         this.shapeRenderer = new ShapeRenderer();
 
-        // Initialize GlyphLayouts
+        // Initialize layout objects for centering the text
         this.titleLayout = new GlyphLayout();
-        this.buttonLayout = new GlyphLayout();
+        this.startButtonLayout = new GlyphLayout();
+        this.controlButtonLayout = new GlyphLayout();
 
-        // Define the bounds for the start button
+        // Define button bounds (position and size)
         startButtonBounds = new Rectangle(
             (Gdx.graphics.getWidth() - 200) / 2,
             (Gdx.graphics.getHeight() - 60) / 2,
@@ -40,91 +42,106 @@ public class MainMenuScreen implements Screen {
         );
         controlButtonBounds = new Rectangle(
             (Gdx.graphics.getWidth() - 200) / 2,
-            (Gdx.graphics.getHeight()  / 2)-100,
+            (Gdx.graphics.getHeight() / 2) - 100,
             200,
             60
         );
     }
 
     @Override
-    public void show() {}
+    public void show() {
+        // Additional initialization code can go here
+    }
 
     @Override
     public void render(float delta) {
         // Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
+        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1); // Background color
 
-        // Enable blending for transparency
+        // Enable blending for transparency (useful for buttons)
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        // First, draw all shapes
+        // Draw the button background shapes first
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        // Draw button background
-        shapeRenderer.setColor(0.2f, 0.5f, 1.0f, 1);
+        shapeRenderer.setColor(0.2f, 0.5f, 1.0f, 1); // Light blue for buttons
         shapeRenderer.rect(startButtonBounds.x, startButtonBounds.y,
             startButtonBounds.width, startButtonBounds.height);
         shapeRenderer.rect(controlButtonBounds.x, controlButtonBounds.y,
             controlButtonBounds.width, controlButtonBounds.height);
         shapeRenderer.end();
 
-        // Then, draw all text
+        // Then draw text (title and button labels)
         batch.begin();
 
-        // Update layouts
+        // Update layout with the text to be drawn
         titleLayout.setText(font, "Monster Metropolis");
-        buttonLayout.setText(font, "START");
-        buttonLayout.setText(font, "Controls");
+        startButtonLayout.setText(font, "START");
+        controlButtonLayout.setText(font, "Controls");
 
-        // Draw title
-        font.setColor(1, 1, 1, 1);
+        // Draw title centered on the screen
+        font.setColor(1, 1, 1, 1); // White color for the title
         font.draw(batch, "Monster Metropolis",
             (Gdx.graphics.getWidth() - titleLayout.width) / 2,
-            Gdx.graphics.getHeight()/2+100);
+            Gdx.graphics.getHeight() / 2 + 100); // Position slightly above center
 
-        // Draw button text
+        // Draw button text (centered within their respective bounds)
         font.draw(batch, "START",
-            startButtonBounds.x + (startButtonBounds.width - buttonLayout.width) / 2,
-            startButtonBounds.y + (startButtonBounds.height + buttonLayout.height) / 2);
+            startButtonBounds.x + (startButtonBounds.width - startButtonLayout.width) / 2,
+            startButtonBounds.y + (startButtonBounds.height + startButtonLayout.height) / 2);
         font.draw(batch, "Controls",
-            controlButtonBounds.x + (controlButtonBounds.width - buttonLayout.width) / 2,
-            controlButtonBounds.y + (controlButtonBounds.height + buttonLayout.height) / 2);
+            controlButtonBounds.x + (controlButtonBounds.width - controlButtonLayout.width) / 2,
+            controlButtonBounds.y + (controlButtonBounds.height + controlButtonLayout.height) / 2);
 
         batch.end();
 
+        // Handle user input (button clicks)
         handleInput();
     }
 
     private void handleInput() {
         if (Gdx.input.isTouched()) {
+            // Get touch coordinates
             float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY(); // Adjust Y for screen coordinates
+
+            // Check if start button is touched
             if (startButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new GameScreen(game));
-                dispose(); // Clean up this screen when switching
+                game.setScreen(new GameScreen(game)); // Switch to the GameScreen
+                dispose(); // Clean up resources for this screen
             }
+            // Check if control button is touched
             if (controlButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new ControlsScreen(game));
-                dispose(); // Clean up this screen when switching
+                game.setScreen(new ControlsScreen(game)); // Switch to the ControlsScreen
+                dispose(); // Clean up resources for this screen
             }
         }
     }
 
     @Override
-    public void resize(int width, int height) {}
+    public void resize(int width, int height) {
+        // Handle resizing if needed
+    }
 
     @Override
-    public void pause() {}
+    public void pause() {
+        // Handle pause if needed
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+        // Handle resume if needed
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+        // Handle hiding the screen if needed
+    }
 
     @Override
     public void dispose() {
+        // Clean up resources
         batch.dispose();
         font.dispose();
         shapeRenderer.dispose();
