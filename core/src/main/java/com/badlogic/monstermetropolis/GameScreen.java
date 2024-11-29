@@ -85,7 +85,7 @@ public class GameScreen implements Screen {
             cityBackground3
         };
         coinTexture = new Texture("coin.png");
-        dinoRightTexture = new Texture("dino_right.png");
+        dinoRightTexture = new Texture("dino.png");
         heartTexture = new Texture("heart.png");
         halfHeartTexture = new Texture("half-heart.png");
 
@@ -137,7 +137,7 @@ public class GameScreen implements Screen {
         float airlinerY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - airlinerHeight) + (Gdx.graphics.getHeight() / 2);
         float airlinerX = Gdx.graphics.getWidth();
         float speed = -300;
-        Texture airlinerTexture = new Texture("airliner-left.png");
+        Texture airlinerTexture = new Texture("airliner.png");
 
         airliners.add(new Airliner(airlinerX, airlinerY, speed, airlinerTexture));
     }
