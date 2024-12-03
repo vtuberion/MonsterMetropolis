@@ -1,5 +1,5 @@
 # Monster Metropolis
-
+To run this game please download the zip files or make a copy by cloning this project using the link https://github.com/vtuberion/MonsterMetropolis.git. Once the project is downloaded/cloned please use the command ./gradlew lwjgl3:run in the terminal to start the game.
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
