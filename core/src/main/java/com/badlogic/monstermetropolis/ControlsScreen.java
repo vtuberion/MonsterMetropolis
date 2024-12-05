@@ -12,15 +12,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ControlsScreen implements Screen {
     private final monstermetropolis game;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private ShapeRenderer shapeRenderer;
-    private Rectangle resumeButtonBounds;
-    private Rectangle mainMenuButtonBounds;
-    private GlyphLayout titleLayout;
-    private GlyphLayout jumpControlLayout;
-    private GlyphLayout resumeButtonLayout;
-    private GlyphLayout mainMenuButtonLayout;
+    private final SpriteBatch batch;
+    private final BitmapFont font;
+    private final ShapeRenderer shapeRenderer;
+    private final Rectangle resumeButtonBounds;
+    private final Rectangle mainMenuButtonBounds;
+    private final GlyphLayout titleLayout;
+    private final GlyphLayout jumpControlLayout;
+    private final GlyphLayout resumeButtonLayout;
+    private final GlyphLayout mainMenuButtonLayout;
 
     public ControlsScreen(final monstermetropolis game) {
         this.game = game;
@@ -37,14 +37,14 @@ public class ControlsScreen implements Screen {
 
         // Define button bounds (position and size)
         resumeButtonBounds = new Rectangle(
-            (Gdx.graphics.getWidth() - 200) / 2,
-            (Gdx.graphics.getHeight() / 2) - 80, // Positioned below the jump control
+            (float) (Gdx.graphics.getWidth() - 200) / 2,
+            ((float) Gdx.graphics.getHeight() / 2) - 80, // Positioned below the jump control
             200,
             60
         );
         mainMenuButtonBounds = new Rectangle(
-            (Gdx.graphics.getWidth() - 200) / 2,
-            (Gdx.graphics.getHeight() / 2) - 160, // Positioned below the resume button
+            (float) (Gdx.graphics.getWidth() - 200) / 2,
+            ((float) Gdx.graphics.getHeight() / 2) - 160, // Positioned below the resume button
             200,
             60
         );
@@ -87,12 +87,12 @@ public class ControlsScreen implements Screen {
         font.setColor(1, 1, 1, 1); // White color for the title
         font.draw(batch, "Controls",
             (Gdx.graphics.getWidth() - titleLayout.width) / 2,
-            Gdx.graphics.getHeight() / 2 + 100); // Position slightly above center
+            (float) Gdx.graphics.getHeight() / 2 + 100); // Position slightly above center
 
         // Draw control instruction text (centered)
         font.draw(batch, "Jump: Spacebar",
             (Gdx.graphics.getWidth() - jumpControlLayout.width) / 2,
-            Gdx.graphics.getHeight() / 2 + 40); // Position below the title
+            (float) Gdx.graphics.getHeight() / 2 + 40); // Position below the title
 
         // Draw button text (centered within their respective bounds)
         font.draw(batch, "Resume",
@@ -107,25 +107,21 @@ public class ControlsScreen implements Screen {
         // Handle user input (button clicks)
         handleInput();
     }
-
     private void handleInput() {
-        if (Gdx.input.isTouched()) {
-            // Get touch coordinates
+        if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY(); // Adjust Y for screen coordinates
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-            // Check if resume button is touched
             if (resumeButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new GameScreen(game)); // Switch to the GameScreen
-                dispose(); // Clean up resources for this screen
-            }
-            // Check if main menu button is touched
-            if (mainMenuButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new MainMenuScreen(game)); // Switch to the MainMenuScreen
-                dispose(); // Clean up resources for this screen
+                game.setScreen(new GameScreen(game));
+                dispose();
+            } else if (mainMenuButtonBounds.contains(touchX, touchY)) {
+                game.setScreen(new MainMenuScreen(game));
+                dispose();
             }
         }
     }
+
 
     @Override
     public void resize(int width, int height) {

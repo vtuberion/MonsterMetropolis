@@ -11,19 +11,19 @@ public class monstermetropolis extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        font = new BitmapFont();
+        font = new BitmapFont();  // Replace with custom font if necessary
         this.setScreen(new MainMenuScreen(this)); // Start with MainMenuScreen
     }
 
     @Override
     public void render() {
-        super.render(); // Call Game's render method to handle the current screen
+        super.render(); // Handle screen rendering
     }
 
     @Override
     public void dispose() {
         batch.dispose();
         font.dispose();
-        getScreen().dispose(); // Dispose the current screen when the game ends
+        getScreen().dispose(); // Clean up the current screen
     }
 }
