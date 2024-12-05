@@ -44,7 +44,7 @@ public class GameScreen implements Screen {
     private static boolean isGameOver;
     private boolean isGameStarted;
     private int score;
-    private static int lives;
+    private static int lives = 6;
     private int currentBackgroundIndex = 0;
     private float timer = 30f; // Timer in seconds
 
@@ -170,10 +170,10 @@ public class GameScreen implements Screen {
         handleInput();
         applyGravity(delta);
         moveCoins();
-        checkCollisions();
         updateTimer(delta);
+        updateCooldown(delta); //decrement damage cooldown
         batch.begin();
-
+        checkCollisions();
         // Draw background
         batch.draw(backgrounds[currentBackgroundIndex], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -199,12 +199,25 @@ public class GameScreen implements Screen {
         // Update and render NYC elements
         nyc.updateAndRender(delta, batch);
 
+        if(nyc.airliners.size()<2){ // fixed issue with airliners no longer spawning
+            nyc.spawnAirliner();
+        }else if(score>30 && nyc.airliners.size()<4){
+            nyc.spawnAirliner(); //Possible condition to increase difficulty by
+            // spawning more enemies or different enemy types
+        }
+
+
         // Game Over Text
         if (isGameOver) {
             drawGameOver();
         }
 
         batch.end();
+    }
+    private void updateCooldown(float delta) {
+        if (damageTimer > 0) {
+            damageTimer -= delta;
+        }
     }
 
     private void updateTimer(float delta) {

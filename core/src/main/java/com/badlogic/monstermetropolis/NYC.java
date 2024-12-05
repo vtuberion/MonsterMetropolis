@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 public class NYC {
-    private List<Airliner> airliners;
+    public List<Airliner> airliners;
     private List<Buildings> buildings;
     private List<Explosion> explosions;
     private Texture[] buildingTextures;

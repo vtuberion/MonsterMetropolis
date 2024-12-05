@@ -9,9 +9,6 @@ explosion.png
 half-heart.png
 heart.png
 helicopter.png
-hs_err_pid12576.log
-hs_err_pid27232.log
-hs_err_pid6100.log
 jet.png
 nyc_background.png
 paris_background.jpg
