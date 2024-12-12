@@ -1,4 +1,4 @@
-package com.badlogic.monstermetropolis;
+package com.badlogic.monstermetropolis.screens;
 
 
 import com.badlogic.gdx.Gdx;
@@ -10,21 +10,21 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.monstermetropolis.monstermetropolis;
 
 
-public class MainMenuScreen implements Screen {
+public class GameOverScreen implements Screen {
     private final monstermetropolis game;
     private SpriteBatch batch;
     private BitmapFont font;
     private ShapeRenderer shapeRenderer;
-    private Rectangle startButtonBounds;
-    private Rectangle controlButtonBounds;
+    private Rectangle restartButtonBounds;
     private GlyphLayout titleLayout;
-    private GlyphLayout startButtonLayout;
-    private GlyphLayout controlButtonLayout;
+    private GlyphLayout restartButtonLayout;
 
 
-    public MainMenuScreen(final monstermetropolis game) {
+
+    public GameOverScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
@@ -34,20 +34,14 @@ public class MainMenuScreen implements Screen {
 
         // Initialize layout objects for centering the text
         this.titleLayout = new GlyphLayout();
-        this.startButtonLayout = new GlyphLayout();
-        this.controlButtonLayout = new GlyphLayout();
+        this.restartButtonLayout = new GlyphLayout();
+
 
 
         // Define button bounds (position and size)
-        startButtonBounds = new Rectangle(
+        restartButtonBounds = new Rectangle(
             (Gdx.graphics.getWidth() - 200) / 2,
             (Gdx.graphics.getHeight() - 60) / 2,
-            200,
-            60
-        );
-        controlButtonBounds = new Rectangle(
-            (Gdx.graphics.getWidth() - 200) / 2,
-            (Gdx.graphics.getHeight() / 2) - 100,
             200,
             60
         );
@@ -75,10 +69,8 @@ public class MainMenuScreen implements Screen {
         // Draw the button background shapes first
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0.2f, 0.5f, 1.0f, 1); // Light blue for buttons
-        shapeRenderer.rect(startButtonBounds.x, startButtonBounds.y,
-            startButtonBounds.width, startButtonBounds.height);
-        shapeRenderer.rect(controlButtonBounds.x, controlButtonBounds.y,
-            controlButtonBounds.width, controlButtonBounds.height);
+        shapeRenderer.rect(restartButtonBounds.x, restartButtonBounds.y,
+            restartButtonBounds.width, restartButtonBounds.height);
         shapeRenderer.end();
 
 
@@ -87,27 +79,22 @@ public class MainMenuScreen implements Screen {
 
 
         // Update layout with the text to be drawn
-        titleLayout.setText(font, "Monster Metropolis");
-        startButtonLayout.setText(font, "START");
-        controlButtonLayout.setText(font, "Controls");
+        titleLayout.setText(font, "GAME OVER");
+        restartButtonLayout.setText(font, "CLICK HERE TO RESTART");
+
 
 
         // Draw title centered on the screen
         font.setColor(1, 1, 1, 1); // White color for the title
-        font.draw(batch, "Monster Metropolis",
+        font.draw(batch, "GAME OVER",
             (Gdx.graphics.getWidth() - titleLayout.width) / 2,
             Gdx.graphics.getHeight() / 2 + 100); // Position slightly above center
 
 
         // Draw button text (centered within their respective bounds)
-        font.draw(batch, "START",
-            startButtonBounds.x + (startButtonBounds.width - startButtonLayout.width) / 2,
-            startButtonBounds.y + (startButtonBounds.height + startButtonLayout.height) / 2);
-        font.draw(batch, "Controls",
-            controlButtonBounds.x + (controlButtonBounds.width - controlButtonLayout.width) / 2,
-            controlButtonBounds.y + (controlButtonBounds.height + controlButtonLayout.height) / 2);
-
-
+        font.draw(batch, "CLICK HERE TO RESTART",
+            restartButtonBounds.x + (restartButtonBounds.width - restartButtonLayout.width) / 2,
+            restartButtonBounds.y + (restartButtonBounds.height + restartButtonLayout.height) / 2);
         batch.end();
 
 
@@ -124,13 +111,8 @@ public class MainMenuScreen implements Screen {
 
 
             // Check if start button is touched
-            if (startButtonBounds.contains(touchX, touchY)) {
+            if (restartButtonBounds.contains(touchX, touchY)) {
                 game.setScreen(new GameScreen(game)); // Switch to the GameScreen
-                dispose(); // Clean up resources for this screen
-            }
-            // Check if control button is touched
-            if (controlButtonBounds.contains(touchX, touchY)) {
-                game.setScreen(new ControlsScreen(game)); // Switch to the ControlsScreen
                 dispose(); // Clean up resources for this screen
             }
         }

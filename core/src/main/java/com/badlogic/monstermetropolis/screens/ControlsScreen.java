@@ -1,4 +1,4 @@
-package com.badlogic.monstermetropolis;
+package com.badlogic.monstermetropolis.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.monstermetropolis.monstermetropolis;
 
 public class ControlsScreen implements Screen {
     private final monstermetropolis game;

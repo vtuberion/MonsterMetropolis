@@ -1,18 +1,22 @@
-package com.badlogic.monstermetropolis;
+package com.badlogic.monstermetropolis.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.monstermetropolis.levels.NYC;
+import com.badlogic.monstermetropolis.levels.Paris;
+import com.badlogic.monstermetropolis.monstermetropolis;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-//Dec 5 9:12
+
 public class GameScreen implements Screen {
 
     final monstermetropolis game;
@@ -27,11 +31,14 @@ public class GameScreen implements Screen {
     private Texture[] backgrounds;
     private Texture[] buildingTextures;
     private Texture airlinerTexture;
-
+    private Texture jetTexture;
+    private Texture tankTexture;
     private Rectangle dinobounds;
     private List<Rectangle> coins;
     private Random random;
     private NYC nyc;
+    private Paris paris; // Add Paris instance
+    private boolean isUsingNYC = true; // Track active city
 
     private float dinoX, dinoY;
     private float lizardVelocityY;
@@ -74,8 +81,10 @@ public class GameScreen implements Screen {
         };
 
         airlinerTexture = new Texture("airliner.png");
-
+        jetTexture = new Texture("jet.png");
+        tankTexture = new Texture("tank.png");
         nyc = new NYC(buildingTextures, airlinerTexture);  // Pass airliner texture to NYC
+        paris = new Paris(buildingTextures, jetTexture); // Initialize Paris
         resetGame();
     }
 
@@ -106,6 +115,7 @@ public class GameScreen implements Screen {
 
         nyc.spawnAirliner();
         nyc.spawnBuildings();
+        paris.spawnJets();
     }
 
     private void spawnCoins() {
@@ -161,7 +171,8 @@ public class GameScreen implements Screen {
                 spawnCoins(); // Maintain the number of coins
             }
         }
-        nyc.checkCollisions(dinobounds, lives);
+        nyc.checkCollisions(dinobounds);
+        paris.checkCollisions(dinobounds);
     }
 
     @Override
@@ -171,9 +182,11 @@ public class GameScreen implements Screen {
         applyGravity(delta);
         moveCoins();
         updateTimer(delta);
-        updateCooldown(delta); //decrement damage cooldown
+        updateCooldown(delta);
+
         batch.begin();
         checkCollisions();
+
         // Draw background
         batch.draw(backgrounds[currentBackgroundIndex], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -182,8 +195,7 @@ public class GameScreen implements Screen {
 
         // Draw coins
         for (Rectangle coin : coins) {
-            batch.draw(coinTexture, coin.x, coin.y,
-                coinTexture.getWidth() * 2, coinTexture.getHeight() * 2);
+            batch.draw(coinTexture, coin.x, coin.y, coinTexture.getWidth() * 2, coinTexture.getHeight() * 2);
         }
 
         // Draw lives
@@ -193,22 +205,28 @@ public class GameScreen implements Screen {
         if (lives % 2 != 0) {
             batch.draw(halfHeartTexture, 10 + (lives / 2) * 40, Gdx.graphics.getHeight() - 40, 64, 64);
         }
+
         game.font.draw(batch, "Score: " + score, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 10);
         drawTimer();
 
-        // Update and render NYC elements
-        nyc.updateAndRender(delta, batch);
-
-        if(nyc.airliners.size()<2){ // fixed issue with airliners no longer spawning
-            nyc.spawnAirliner();
-        }else if(score>30 && nyc.airliners.size()<4){
-            nyc.spawnAirliner(); //Possible condition to increase difficulty by
-            // spawning more enemies or different enemy types
+        // Update and render the active city
+        if (isUsingNYC) {
+            nyc.updateAndRender(delta, batch);
+        } else {
+            paris.updateAndRender(delta, batch);
         }
 
+        // Switch to Paris after 30 seconds
+        if (timer <= 0 && isUsingNYC) {
+            isUsingNYC = false;
+            timer = 30f; // Reset timer for Paris
+            currentBackgroundIndex = 1; // Change to Paris background
+            paris.spawnJets();
+            paris.spawnBuildings();
+        }
 
         // Game Over Text
-        if (isGameOver) {
+        if (lives == 0) {
             drawGameOver();
         }
 
@@ -235,9 +253,7 @@ public class GameScreen implements Screen {
         game.font.draw(batch, timerText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 30);
     }
     private void drawGameOver() {
-        ScreenUtils.clear(0, 0, 0, 1);
-        gameOverFont.draw(batch, "Game Over!", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2 + 50);
-        gameOverFont.draw(batch, "Tap to Respawn", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2);
+        game.setScreen(new GameOverScreen(game));
     }
     private static void gameOver() {
         isGameOver = true;

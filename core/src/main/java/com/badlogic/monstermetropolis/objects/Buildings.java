@@ -1,4 +1,4 @@
-package com.badlogic.monstermetropolis;
+package com.badlogic.monstermetropolis.objects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
