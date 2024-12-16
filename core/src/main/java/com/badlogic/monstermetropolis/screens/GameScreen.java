@@ -2,6 +2,8 @@ package com.badlogic.monstermetropolis.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -55,6 +57,10 @@ public class GameScreen implements Screen {
     private int currentBackgroundIndex = 0;
     private float timer = 30f; // Timer in seconds
 
+    private Music backgroundMusic;
+    private Sound coinSound;
+
+
     public GameScreen(final monstermetropolis game) {
         this.game = game;
         this.batch = new SpriteBatch();
@@ -83,6 +89,10 @@ public class GameScreen implements Screen {
         airlinerTexture = new Texture("airliner.png");
         jetTexture = new Texture("jet.png");
         tankTexture = new Texture("tank.png");
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin-recieved.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sketchbook 2023-11-29.ogg")); //Background music to play during gameplay (current file is a placeholder for testing)
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
         nyc = new NYC(buildingTextures, airlinerTexture);  // Pass airliner texture to NYC
         paris = new Paris(buildingTextures, jetTexture); // Initialize Paris
         resetGame();
@@ -168,6 +178,7 @@ public class GameScreen implements Screen {
             if (dinobounds.overlaps(coin)) {
                 coins.remove(i);
                 score++;
+                coinSound.play(); // added sound to collecting coins
                 spawnCoins(); // Maintain the number of coins
             }
         }
@@ -294,5 +305,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        backgroundMusic.play();
+
     }
 }

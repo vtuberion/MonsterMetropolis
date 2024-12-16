@@ -1,6 +1,7 @@
 package com.badlogic.monstermetropolis.levels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -24,6 +25,8 @@ public class NYC {
     private float buildingSpawnTimer = 0f;
     private float buildingSpawnDelay = 2f;
 
+    private Sound explosionSound;
+
     public NYC(Texture[] buildingTextures, Texture airlinerTexture) {
         this.buildingTextures = buildingTextures;
         this.airlinerTexture = airlinerTexture;
@@ -31,6 +34,8 @@ public class NYC {
         this.buildings = new ArrayList<>();
         this.explosions = new ArrayList<>();
         this.random = new Random();
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav")); //Sound for when explosion is triggered (drop.wav is a placeholder for testing)
+
     }
 
     public void spawnAirliner() {
@@ -80,6 +85,7 @@ public class NYC {
         for (int i = airliners.size() - 1; i >= 0; i--) {
             Airliners airliner = airliners.get(i);
             if (dinobounds.overlaps(airliner.getBounds())) {
+                explosionSound.play(); //explosion sound to play on collision
                 airliners.remove(i); // Remove airliner
                 GameScreen.loselife(); // Decrease a life
                 spawnAirliner();

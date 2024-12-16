@@ -40,9 +40,9 @@ public class GameOverScreen implements Screen {
 
         // Define button bounds (position and size)
         restartButtonBounds = new Rectangle(
-            (Gdx.graphics.getWidth() - 200) / 2,
+            (Gdx.graphics.getWidth() - 600) / 2,
             (Gdx.graphics.getHeight() - 60) / 2,
-            200,
+            600,
             60
         );
     }

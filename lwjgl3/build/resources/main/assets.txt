@@ -5,6 +5,7 @@ building3.png
 coin-recieved.mp3
 coin.png
 dino.png
+drop.wav
 explosion.png
 half-heart.png
 heart.png
@@ -13,5 +14,6 @@ jet.png
 nyc_background.png
 paris_background.jpg
 road.png
+Sketchbook 2023-11-29.ogg
 tank.png
 tokyo_background.png
