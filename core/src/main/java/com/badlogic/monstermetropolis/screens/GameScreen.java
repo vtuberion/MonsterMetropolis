@@ -13,8 +13,6 @@ import com.badlogic.monstermetropolis.levels.NYC;
 import com.badlogic.monstermetropolis.levels.Paris;
 import com.badlogic.monstermetropolis.monstermetropolis;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -52,7 +50,7 @@ public class GameScreen implements Screen {
 
     private static boolean isGameOver;
     private boolean isGameStarted;
-    private int score;
+    public static int score;
     private static int lives = 6;
     private int currentBackgroundIndex = 0;
     private float timer = 30f; // Timer in seconds

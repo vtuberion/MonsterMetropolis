@@ -95,9 +95,10 @@ public class NYC {
         // Check collisions with buildings
         for (int i = buildings.size() - 1; i >= 0; i--) {
             Buildings building = buildings.get(i);
-            if (dinobounds.overlaps(building.getBounds())) {
+            if (dinobounds.overlaps(building.getBounds()) &&
+                (dinobounds.y > dinobounds.height)) {
                 buildings.remove(i); // Remove building
-                // No life penalty; adjust if needed
+                GameScreen.score++;
             }
         }
     }
