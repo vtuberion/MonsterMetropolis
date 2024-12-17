@@ -6,6 +6,7 @@ coin-recieved.mp3
 coin.png
 dino.png
 drop.wav
+explosion-91872.mp3
 explosion.png
 half-heart.png
 heart.png

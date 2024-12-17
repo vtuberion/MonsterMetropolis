@@ -26,6 +26,7 @@ public class NYC {
     private float buildingSpawnDelay = 2f;
 
     private Sound explosionSound;
+    private Sound buildingScoreSound;
 
     public NYC(Texture[] buildingTextures, Texture airlinerTexture) {
         this.buildingTextures = buildingTextures;
@@ -34,7 +35,8 @@ public class NYC {
         this.buildings = new ArrayList<>();
         this.explosions = new ArrayList<>();
         this.random = new Random();
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav")); //Sound for when explosion is triggered (drop.wav is a placeholder for testing)
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion-91872.mp3")); //Sound for when explosion is triggered (drop.wav is a placeholder for testing)
+        buildingScoreSound = Gdx.audio.newSound(Gdx.files.internal("coin-recieved.mp3"));
 
     }
 
@@ -99,6 +101,12 @@ public class NYC {
                 (dinobounds.y > dinobounds.height)) {
                 buildings.remove(i); // Remove building
                 GameScreen.score++;
+                buildingScoreSound.play();
+            }
+            else if(dinobounds.overlaps(building.getBounds())){
+                explosionSound.play();
+                buildings.remove(i);
+                GameScreen.loselife();
             }
         }
     }

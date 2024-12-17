@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
         lives = 6;
         timer = 30f;
 
-        dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth() * 2, dinoRightTexture.getHeight() * 2); // Double size
+        dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth()-20 , dinoRightTexture.getHeight() ); // Double size
         coins = new ArrayList<>();
         random = new Random();
         spawnCoins();
@@ -140,6 +140,8 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
             lizardVelocityY = JUMP_VELOCITY;
         }
+
+
     }
 
 
@@ -262,6 +264,7 @@ public class GameScreen implements Screen {
         game.font.draw(batch, timerText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 30);
     }
     private void drawGameOver() {
+        backgroundMusic.pause();
         game.setScreen(new GameOverScreen(game));
     }
     private static void gameOver() {

@@ -20,11 +20,14 @@ public class ControlsScreen implements Screen {
     private final Rectangle mainMenuButtonBounds;
     private final GlyphLayout titleLayout;
     private final GlyphLayout jumpControlLayout;
+
+    private final GlyphLayout playerGoalLayout;
     private final GlyphLayout resumeButtonLayout;
     private final GlyphLayout mainMenuButtonLayout;
 
     public ControlsScreen(final monstermetropolis game) {
         this.game = game;
+
         this.batch = new SpriteBatch();
         this.font = new BitmapFont();
         this.font.getData().setScale(2); // Increase font size for better visibility
@@ -35,6 +38,7 @@ public class ControlsScreen implements Screen {
         this.jumpControlLayout = new GlyphLayout();
         this.resumeButtonLayout = new GlyphLayout();
         this.mainMenuButtonLayout = new GlyphLayout();
+        this.playerGoalLayout = new GlyphLayout();
 
         // Define button bounds (position and size)
         resumeButtonBounds = new Rectangle(
@@ -79,22 +83,26 @@ public class ControlsScreen implements Screen {
         batch.begin();
 
         // Update layout with the text to be drawn
-        titleLayout.setText(font, "Controls");
+        titleLayout.setText(font, "Controls and Goals");
         jumpControlLayout.setText(font, "Jump: Spacebar");
+        playerGoalLayout.setText(font,"Goal: Jump on buildings and \n collect coins to score points.");
         resumeButtonLayout.setText(font, "Resume");
         mainMenuButtonLayout.setText(font, "Main Menu");
 
         // Draw title centered on the screen
         font.setColor(1, 1, 1, 1); // White color for the title
-        font.draw(batch, "Controls",
+        font.draw(batch, "Controls and Goals",
             (Gdx.graphics.getWidth() - titleLayout.width) / 2,
-            (float) Gdx.graphics.getHeight() / 2 + 100); // Position slightly above center
+            (float) Gdx.graphics.getHeight() / 2 + 200); // Position slightly above center
 
         // Draw control instruction text (centered)
         font.draw(batch, "Jump: Spacebar",
             (Gdx.graphics.getWidth() - jumpControlLayout.width) / 2,
-            (float) Gdx.graphics.getHeight() / 2 + 40); // Position below the title
+            (float) Gdx.graphics.getHeight() / 2 + 140); // Position below the title
 
+        font.draw(batch, "Goal: Jump on buildings and \ncollect coins to score points.",
+            (Gdx.graphics.getWidth() - playerGoalLayout.width) / 2,
+            (float) Gdx.graphics.getHeight() / 2+100 ); // Position below the title
         // Draw button text (centered within their respective bounds)
         font.draw(batch, "Resume",
             resumeButtonBounds.x + (resumeButtonBounds.width - resumeButtonLayout.width) / 2,

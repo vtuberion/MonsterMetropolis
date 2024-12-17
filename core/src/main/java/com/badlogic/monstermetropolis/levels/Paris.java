@@ -1,6 +1,7 @@
 package com.badlogic.monstermetropolis.levels;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -24,6 +25,9 @@ public class Paris {
     private float buildingSpawnTimer = 0f;
     private float buildingSpawnDelay = 2f;
 
+    private Sound explosionSound;
+    private Sound buildingScoreSound;
+
     public Paris(Texture[] buildingTextures, Texture jetTexture) {
         this.buildingTextures = buildingTextures;
         this.jetTexture = jetTexture;
@@ -31,6 +35,9 @@ public class Paris {
         this.buildings = new ArrayList<>();
         this.explosions = new ArrayList<>();
         this.random = new Random();
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion-91872.mp3")); //Sound for when explosion is triggered (drop.wav is a placeholder for testing)
+        buildingScoreSound = Gdx.audio.newSound(Gdx.files.internal("coin-recieved.mp3"));
+
     }
 
     public void spawnJets() {
@@ -80,6 +87,7 @@ public class Paris {
         for (int i = jets.size() - 1; i >= 0; i--) {
             Jets jet = jets.get(i);
             if (dinoBounds.overlaps(jet.getBounds())) {
+                explosionSound.play();
                 jets.remove(i); // Remove jet
                 GameScreen.loselife(); // Decrease a life
                 spawnJets();
@@ -89,9 +97,16 @@ public class Paris {
         // Check collisions with buildings
         for (int i = buildings.size() - 1; i >= 0; i--) {
             Buildings building = buildings.get(i);
-            if (dinoBounds.overlaps(building.getBounds())) {
+            if (dinoBounds.overlaps(building.getBounds()) &&
+                (dinoBounds.y > dinoBounds.height)) {
                 buildings.remove(i); // Remove building
-                // No life penalty; adjust if needed
+                GameScreen.score++;
+                buildingScoreSound.play();
+            }
+            else if(dinoBounds.overlaps(building.getBounds())){
+                explosionSound.play();
+                buildings.remove(i);
+                GameScreen.loselife();
             }
         }
     }
