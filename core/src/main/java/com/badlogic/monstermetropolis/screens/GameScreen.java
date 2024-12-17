@@ -140,8 +140,6 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
             lizardVelocityY = JUMP_VELOCITY;
         }
-
-
     }
 
 
@@ -235,7 +233,7 @@ public class GameScreen implements Screen {
             paris.spawnJets();
             paris.spawnBuildings();
         } else if (timer <= 0 && currentBackgroundIndex==1) {
-            // goal screen
+            game.setScreen(new GameWinScreen(game));
         }
 
         // Game Over Text
