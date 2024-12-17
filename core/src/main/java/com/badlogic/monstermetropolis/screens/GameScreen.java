@@ -90,7 +90,7 @@ public class GameScreen implements Screen {
         coinSound = Gdx.audio.newSound(Gdx.files.internal("coin-recieved.mp3"));
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sketchbook 2023-11-29.ogg")); //Background music to play during gameplay (current file is a placeholder for testing)
         backgroundMusic.setLooping(true);
-        backgroundMusic.play();
+        //backgroundMusic.play();
         nyc = new NYC(buildingTextures, airlinerTexture);  // Pass airliner texture to NYC
         paris = new Paris(buildingTextures, jetTexture); // Initialize Paris
         resetGame();
@@ -306,7 +306,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        backgroundMusic.play();
+        if (!backgroundMusic.isPlaying()) {
+            backgroundMusic.play();
+        }
 
     }
 }
