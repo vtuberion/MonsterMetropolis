@@ -12,6 +12,7 @@ half-heart.png
 heart.png
 helicopter.png
 jet.png
+MonsterMetropolisRevised.zip
 nyc_background.png
 paris_background.jpg
 road.png
