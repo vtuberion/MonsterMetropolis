@@ -234,6 +234,8 @@ public class GameScreen implements Screen {
             currentBackgroundIndex = 1; // Change to Paris background
             paris.spawnJets();
             paris.spawnBuildings();
+        } else if (timer <= 0 && currentBackgroundIndex==1) {
+            // goal screen
         }
 
         // Game Over Text
