@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
         lives = 6;
         timer = 30f;
 
-        dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth()-20 , dinoRightTexture.getHeight() ); // Double size
+        dinobounds = new Rectangle(dinoX, dinoY, dinoRightTexture.getWidth()-20 , dinoRightTexture.getHeight()+10 ); // Double size
         coins = new ArrayList<>();
         random = new Random();
         spawnCoins();

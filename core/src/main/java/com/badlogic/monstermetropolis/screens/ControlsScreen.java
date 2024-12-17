@@ -86,7 +86,7 @@ public class ControlsScreen implements Screen {
         titleLayout.setText(font, "Controls and Goals");
         jumpControlLayout.setText(font, "Jump: Spacebar");
         playerGoalLayout.setText(font,"Goal: Jump on buildings and \n collect coins to score points.");
-        resumeButtonLayout.setText(font, "Resume");
+        resumeButtonLayout.setText(font, "Play");
         mainMenuButtonLayout.setText(font, "Main Menu");
 
         // Draw title centered on the screen
@@ -104,7 +104,7 @@ public class ControlsScreen implements Screen {
             (Gdx.graphics.getWidth() - playerGoalLayout.width) / 2,
             (float) Gdx.graphics.getHeight() / 2+100 ); // Position below the title
         // Draw button text (centered within their respective bounds)
-        font.draw(batch, "Resume",
+        font.draw(batch, "Play",
             resumeButtonBounds.x + (resumeButtonBounds.width - resumeButtonLayout.width) / 2,
             resumeButtonBounds.y + (resumeButtonBounds.height + resumeButtonLayout.height) / 2);
         font.draw(batch, "Main Menu",

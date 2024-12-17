@@ -42,7 +42,7 @@ public class Paris {
 
     public void spawnJets() {
         float jetHeight = 64;
-        float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2);
+        float jetY = random.nextFloat() * (Gdx.graphics.getHeight() / 2 - jetHeight) + (Gdx.graphics.getHeight() / 2-40);
         float jetX = Gdx.graphics.getWidth();
         float speed = -300;
 
@@ -52,6 +52,7 @@ public class Paris {
     public void spawnBuildings() {
         float buildingX = Gdx.graphics.getWidth();
         float buildingY = 0;
+        float speed = -450;
         Texture texture = buildingTextures[MathUtils.random(buildingTextures.length - 1)];
         Buildings building = new Buildings(texture, buildingX, buildingY, 200, 300, -100);
         buildings.add(building);
